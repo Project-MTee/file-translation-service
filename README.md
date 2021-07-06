@@ -1,20 +1,103 @@
-#Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# File Translation Service
 
-#Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+Stores information about File translation tasks and documents.
+If user wants to translate file, task is submitted to file translation workers via **RabbitMQ**
 
-#Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+```
+ -----------------------------------             --------------------------------
+|                                   |           |                                |
+|                                   |   → → →   |           Database             |
+|                                   |   ← ← ←   |                                |
+|                                   |            --------------------------------
+|      File translation service     |
+|             [Public]              |            --------------------------------
+|                                   |           |                                |
+|                                   |   → → →   |   File storage, linked to DB   |
+|                                   |   ← ← ←   |                                |
+ -----------------------------------             --------------------------------
 
-#Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+            ↓           ↓
+            ↓           ↓
+            ↓           ↓
+            ↓           ↓
+            ↓           ↓   Fetch available translation systems for request validation
+            ↓           ↓                        --------------------------------
+            ↓           ↓                       |                                |
+            ↓           ↓ → → → → → → → → → →   |   Translation system service   |
+            ↓                                   |                                |
+            ↓                                    --------------------------------
+            ↓
+            ↓
+            ↓
+            ↓
+            ↓
+            ↓   Submits translation task to be processed
+            ↓   by file translation workers (via RabbitMQ)
+            ↓
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://www.visualstudio.com/en-us/docs/git/create-a-readme). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+ ------------------------------------
+|                                   |
+|      File translation worker      |
+|                                   |
+ ------------------------------------
+
+```
+
+# Development tools
+
+## Entity Framework tools
+
+```Bash
+dotnet tool install --global dotnet-ef
+```
+
+# Build
+
+Using docker
+```Shell
+docker build -f ./FileTranslationService/Dockerfile -t file-translation-service .
+```
+
+# Test
+
+Install prerequisites
+
+```Shell
+# install kubectl
+choco install kubernetes-cli
+# install helm
+choco install kubernetes-helm
+```
+
+Install RabbitMQ, MySQL
+
+```Shell
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+# RabbitMQ
+helm install rabbitmq --set auth.username=root,auth.password=root,auth.erlangCookie=secretcookie bitnami/rabbitmq
+
+# MySQL
+helm install mysql --set auth.rootPassword=root bitnami/mysql
+```
+
+forward ports:
+
+```Shell
+# RabbitMQ
+kubectl port-forward --namespace default svc/rabbitmq 15672:15672 5672:5672
+
+# MySQL
+kubectl port-forward --namespace default svc/mysql 3306:3306
+```
+
+Using docker compose
+```
+docker-compose up --build
+```
+
+Open Swagger
+```
+http://localhost:5001/swagger/index.html
+```
