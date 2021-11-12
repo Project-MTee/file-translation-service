@@ -1,32 +1,32 @@
 using AutoMapper;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
+using Serilog;
 using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Tilde.MT.FileTranslationService.Enums;
+using Tilde.MT.FileTranslationService.Extensions;
+using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.Configuration;
 using Tilde.MT.FileTranslationService.Models.Mappings;
 using Tilde.MT.FileTranslationService.Services;
-using Tilde.MT.FileTranslationService.Enums;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.Json.Serialization;
-using Tilde.MT.FileTranslationService.Facades;
-using MassTransit;
-using RabbitMQ.Client;
-using Tilde.MT.FileTranslationService.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using Tilde.MT.FileTranslationService.Models;
-using Microsoft.AspNetCore.Diagnostics;
-using Serilog;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
-using System.Linq;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Tilde.MT.FileTranslationService
 {
@@ -98,7 +98,8 @@ namespace Tilde.MT.FileTranslationService
                     );
                 });
 
-            services.AddDbContextPool<Models.Database.TaskDbContext>(options => {
+            services.AddDbContextPool<Models.Database.TaskDbContext>(options =>
+            {
                 options.UseMySql(
                     serviceConfiguration.Database.ConnectionString,
                     ServerVersion.AutoDetect(serviceConfiguration.Database.ConnectionString)
@@ -139,7 +140,7 @@ namespace Tilde.MT.FileTranslationService
 
                     // Specify queue
                     //EndpointConvention.Map<Models.RabbitMQ.FileTranslationRequest>(new Uri("queue:file-translation"));
-                    
+
                     // Specify exchange 
                     config.Message<Models.RabbitMQ.FileTranslationRequest>(x =>
                     {
@@ -175,7 +176,8 @@ namespace Tilde.MT.FileTranslationService
             services.AddMassTransitHostedService(false);
 
             // Catch client errors
-            services.Configure<ApiBehaviorOptions>(options => {
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
                 options.InvalidModelStateResponseFactory = actionContext =>
                 {
                     var modelStateEntries = actionContext.ModelState.Where(e => e.Value.Errors.Count > 0).ToArray();
@@ -197,7 +199,7 @@ namespace Tilde.MT.FileTranslationService
                                     Message = Enums.ErrorSubCode.GatewayRequestTooLarge.Description()
                                 }
                             }
-                        ); 
+                        );
                     }
                     else
                     {
@@ -260,7 +262,7 @@ namespace Tilde.MT.FileTranslationService
                                 Error = new Error()
                                 {
                                     Code = ((int)HttpStatusCode.InternalServerError) * 1000 + (int)Enums.ErrorSubCode.GatewayGeneric,
-                                    Message = Enums.ErrorSubCode.GatewayGeneric.Description() 
+                                    Message = Enums.ErrorSubCode.GatewayGeneric.Description()
                                 }
                             });
                         }
@@ -286,7 +288,8 @@ namespace Tilde.MT.FileTranslationService
                 endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions()
                 {
                     // check if MassTransit can connect 
-                    Predicate = (check) => {
+                    Predicate = (check) =>
+                    {
                         return check.Tags.Contains("ready");
                     }
                 });
