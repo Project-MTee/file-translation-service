@@ -52,6 +52,8 @@ namespace Tilde.MT.FileTranslationService.Services
         /// <param name="file"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
+        /// <exception cref="FileExtensionUnsupportedException">File extension is not supported</exception>
+        /// <exception cref="FileConflictException">File already exists</exception>
         public async Task<string> Save(Guid task, FileCategory category, Stream file, string fileName)
         {
             Directory.CreateDirectory(GetFileTranslationDirectory(task));

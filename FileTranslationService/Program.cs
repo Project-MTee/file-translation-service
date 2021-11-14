@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using System;
+using Tilde.MT.FileTranslationService.Models.Configuration;
 
 namespace Tilde.MT.FileTranslationService
 {
@@ -14,9 +15,17 @@ namespace Tilde.MT.FileTranslationService
     {
         public static void Main(string[] args)
         {
-            ConfigureSerilog();
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+#if DEBUG
+                .AddJsonFile($"appsettings.Development.json", optional: false)
+#endif
+                .AddEnvironmentVariables()
+                .Build();
 
-            var host = CreateHostBuilder(args).Build();
+            ConfigureSerilog(configuration);
+
+            var host = CreateHostBuilder(args, configuration).Build();
 
             MigrateDatabase(host);
 
@@ -43,8 +52,10 @@ namespace Tilde.MT.FileTranslationService
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args, IConfiguration configuration)
         {
+            var settingsConfiguration = configuration.GetSection("Configuration").Get<ConfigurationSettings>();
+
             return Host.CreateDefaultBuilder(args)
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -52,21 +63,13 @@ namespace Tilde.MT.FileTranslationService
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseKestrel(options =>
                     {
-                        options.Limits.MaxRequestBodySize = 20480; // 20KB
+                        options.Limits.MaxRequestBodySize = settingsConfiguration.RequestSizeLimit;
                     });
                 });
         }
 
-        private static void ConfigureSerilog()
+        private static void ConfigureSerilog(IConfiguration configuration)
         {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-#if DEBUG
-                .AddJsonFile($"appsettings.Development.json", optional: false)
-#endif
-                .AddEnvironmentVariables()
-                .Build();
-
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Debug()

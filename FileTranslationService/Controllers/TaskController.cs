@@ -8,10 +8,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
+using Tilde.MT.FileTranslationService.Exceptions;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Facades;
-using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;
+using Tilde.MT.FileTranslationService.Models.Errors;
 using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Controllers
@@ -84,27 +85,20 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
         public async Task<ActionResult<Models.DTO.Task.Task>> Create([FromForm] NewTask createTask)
         {
-            var languageDirections = await _languageDirectionService.Read();
-
-            if (languageDirections == null)
+            try
             {
-                return FormatAPIError(HttpStatusCode.InternalServerError, ErrorSubCode.GatewayLanguageDirectionGeneric);
+                var valid = await _languageDirectionService.Validate(createTask);
+
+                if (!valid)
+                {
+                    return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayLanguageDirectionNotFound);
+                }
             }
-
-            // check if language direction exists.
-            var languageDirectionInSettings = languageDirections.Where(item =>
+            catch (LanguageDirectionsException ex)
             {
-                var languageMatches = item.SourceLanguage == createTask.SourceLanguage &&
-                    item.TargetLanguage == createTask.TargetLanguage;
+                _logger.LogError(ex, "Exception loading language directions");
 
-                var domainMatches = string.IsNullOrEmpty(createTask.Domain) || item.Domain == createTask.Domain;
-
-                return domainMatches && languageMatches;
-            });
-
-            if (!languageDirectionInSettings.Any())
-            {
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayLanguageDirectionNotFound);
+                return FormatAPIError(HttpStatusCode.InternalServerError, ErrorSubCode.GatewayLanguageDirectionGeneric);
             }
 
             using var fileStream = createTask.File.OpenReadStream();
@@ -123,7 +117,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
             }
             catch (FileExtensionUnsupportedException ex)
             {
-                _logger.LogError(ex, $"File extension: {createTask.File.FileName} is not supported");
+                _logger.LogError(ex, $"File extension is not supported");
 
                 return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
             }
@@ -149,7 +143,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         /// <param name="task"></param>
         /// <param name="editTask"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = AuthenticationSchemeType.FileTranslationWorkflow)]
+        [Authorize(AuthenticationSchemes = AuthenticationScheme.FileTranslationWorkflow)]
         [HttpPut]
         [Route("{task}")]
         [SwaggerResponse((int)HttpStatusCode.OK, Description = "", Type = typeof(Models.DTO.Task.Task))]

@@ -61,7 +61,7 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         /// </summary>
         /// <example>Queuing</example>
         [JsonPropertyName("status")]
-        public TranslationStatusType TranslationStatus { get; set; }
+        public TranslationStatus TranslationStatus { get; set; }
 
         /// <summary>
         /// Count of text segments in the source file

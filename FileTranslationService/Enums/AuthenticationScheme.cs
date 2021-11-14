@@ -1,6 +1,6 @@
 ﻿namespace Tilde.MT.FileTranslationService.Enums
 {
-    public class AuthenticationSchemeType
+    public class AuthenticationScheme
     {
         /// <summary>
         /// This is System internal FileTranslationService user.

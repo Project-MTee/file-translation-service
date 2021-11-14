@@ -72,7 +72,7 @@ namespace Tilde.MT.FileTranslationService.Services
         public async Task<Models.DTO.Task.Task> Create(NewTask createTask)
         {
             var metadata = _mapper.Map<Models.Database.Task>(createTask);
-            metadata.TranslationStatus = await _dbContext.TranslationStatuses.FindAsync((int)TranslationStatusType.Queuing);
+            metadata.TranslationStatus = await _dbContext.TranslationStatuses.FindAsync((int)Enums.TranslationStatus.Queuing);
             _dbContext.Tasks.Add(metadata);
 
             await _dbContext.SaveChangesAsync();

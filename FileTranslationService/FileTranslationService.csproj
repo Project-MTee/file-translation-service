@@ -8,8 +8,7 @@
     <RootNamespace>Tilde.MT.FileTranslationService</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
-    <Version>1.1.0</Version>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>1.2.0</Version>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 

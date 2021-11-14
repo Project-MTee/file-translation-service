@@ -19,5 +19,10 @@ namespace Tilde.MT.FileTranslationService.Models.Configuration
         /// Not using mime types, because not all types are declared for example tmx
         /// </summary>
         public HashSet<string> AllowedFileExtensions { get; set; }
+        /// <summary>
+        /// Request size limit in bytes.
+        /// For example: 20480 -> 20KB
+        /// </summary>
+        public long RequestSizeLimit { get; set; }
     }
 }

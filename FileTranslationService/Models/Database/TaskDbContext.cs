@@ -23,7 +23,7 @@ namespace Tilde.MT.FileTranslationService.Models.Database
         {
             #region Seed database
 
-            foreach (var status in (TranslationStatusType[])Enum.GetValues(typeof(TranslationStatusType)))
+            foreach (var status in (Enums.TranslationStatus[])Enum.GetValues(typeof(Enums.TranslationStatus)))
             {
                 modelBuilder.Entity<TranslationStatus>().HasData(
                     new TranslationStatus
