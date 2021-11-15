@@ -17,11 +17,11 @@ namespace Tilde.MT.FileTranslationService.Models.Database
 
         [NotMapped]
         [JsonIgnore]
-        public TranslationStatusType Status
+        public Enums.TranslationStatus Status
         {
             get
             {
-                return (TranslationStatusType)Id;
+                return (Enums.TranslationStatus)Id;
             }
         }
 

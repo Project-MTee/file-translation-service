@@ -2,7 +2,7 @@
 using System.Net;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Extensions;
-using Tilde.MT.FileTranslationService.Models;
+using Tilde.MT.FileTranslationService.Models.Errors;
 
 namespace Tilde.MT.FileTranslationService.Controllers
 {

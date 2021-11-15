@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Tilde.MT.FileTranslationService.Models.DTO.Task;
 using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Facades

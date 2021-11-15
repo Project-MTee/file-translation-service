@@ -3,7 +3,7 @@
     /// <summary>
     /// Translation status types
     /// </summary>
-    public enum TranslationStatusType
+    public enum TranslationStatus
     {
         #region Initializing
 

@@ -23,8 +23,8 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Extensions;
 using Tilde.MT.FileTranslationService.Facades;
-using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.Configuration;
+using Tilde.MT.FileTranslationService.Models.Errors;
 using Tilde.MT.FileTranslationService.Models.Mappings;
 using Tilde.MT.FileTranslationService.Services;
 
@@ -90,7 +90,7 @@ namespace Tilde.MT.FileTranslationService
             });
 
             services.AddAuthentication()
-                .AddBasicAuthentication(AuthenticationSchemeType.FileTranslationWorkflow, options => { }, credentials =>
+                .AddBasicAuthentication(AuthenticationScheme.FileTranslationWorkflow, options => { }, credentials =>
                 {
                     return Task.FromResult(
                         credentials.username == serviceConfiguration.FileTranslation.UserName &&
@@ -137,9 +137,6 @@ namespace Tilde.MT.FileTranslationService
                     });
 
                     #region File translation publish configuration
-
-                    // Specify queue
-                    //EndpointConvention.Map<Models.RabbitMQ.FileTranslationRequest>(new Uri("queue:file-translation"));
 
                     // Specify exchange 
                     config.Message<Models.RabbitMQ.FileTranslationRequest>(x =>

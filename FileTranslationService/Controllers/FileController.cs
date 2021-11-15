@@ -9,8 +9,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
-using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
+using Tilde.MT.FileTranslationService.Models.Errors;
 using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Controllers
@@ -46,7 +46,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [HttpGet]
         [Route("{task}/{file}")]
         [AllowAnonymous]
-        [Authorize(AuthenticationSchemes = AuthenticationSchemeType.FileTranslationWorkflow)]
+        [Authorize(AuthenticationSchemes = AuthenticationScheme.FileTranslationWorkflow)]
         [SwaggerResponse((int)HttpStatusCode.OK, Description = "")]
         [SwaggerResponse((int)HttpStatusCode.Forbidden, Description = "Source file is forbidden to download")]
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task or File is not found", Type = typeof(APIError))]
@@ -84,7 +84,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         /// <param name="category"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = AuthenticationSchemeType.FileTranslationWorkflow)]
+        [Authorize(AuthenticationSchemes = AuthenticationScheme.FileTranslationWorkflow)]
         [HttpPost]
         [Route("{task}")]
         [RequestSizeLimit(104_857_600)] // Puprously larger than user uploaded file 100MB
