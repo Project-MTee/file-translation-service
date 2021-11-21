@@ -2,20 +2,20 @@
 
 namespace Tilde.MT.FileTranslationService.Models.Errors
 {
-    public class Error
+    public record Error
     {
         /// <summary>
         /// Error code
         /// </summary>
         /// <example>500</example>
         [JsonPropertyName("code")]
-        public int Code { get; set; }
+        public int Code { get; init; }
 
         /// <summary>
         /// Textual message of error
         /// </summary>
         /// <example>Error message</example>
         [JsonPropertyName("message")]
-        public string Message { get; set; }
+        public string Message { get; init; }
     }
 }

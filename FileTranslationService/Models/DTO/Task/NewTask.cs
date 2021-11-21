@@ -5,14 +5,14 @@ using System.Text.Json.Serialization;
 
 namespace Tilde.MT.FileTranslationService.Models.DTO.Task
 {
-    public class NewTask
+    public record NewTask
     {
         /// <summary>
         /// Translatable file
         /// </summary>
         [Required]
         [JsonPropertyName("file")]
-        public IFormFile File { get; set; }
+        public IFormFile File { get; init; }
 
         /// <summary>
         /// Language code of the source file
@@ -21,7 +21,7 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         [Required]
         [MaxLength(2)]
         [JsonPropertyName("srcLang")]
-        public string SourceLanguage { get; set; }
+        public string SourceLanguage { get; init; }
 
         /// <summary>
         /// Language code of the translation
@@ -30,7 +30,7 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         [Required]
         [MaxLength(2)]
         [JsonPropertyName("trgLang")]
-        public string TargetLanguage { get; set; }
+        public string TargetLanguage { get; init; }
 
         /// <summary>
         /// Translation system domain to use for the file translation. Domain is detected automatically if not provided.
@@ -38,6 +38,6 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         /// <example>general</example>
         [MaxLength(200)]
         [JsonPropertyName("domain")]
-        public string Domain { get; set; }
+        public string Domain { get; init; }
     }
 }

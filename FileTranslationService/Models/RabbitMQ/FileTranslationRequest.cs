@@ -2,9 +2,9 @@
 
 namespace Tilde.MT.FileTranslationService.Models.RabbitMQ
 {
-    public class FileTranslationRequest
+    public record FileTranslationRequest
     {
         [JsonProperty("task")]
-        public string Task { get; set; }
+        public string Task { get; init; }
     }
 }

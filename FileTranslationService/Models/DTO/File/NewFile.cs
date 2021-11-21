@@ -2,9 +2,9 @@
 
 namespace Tilde.MT.FileTranslationService.Models.DTO.File
 {
-    public class NewFile
+    public record NewFile
     {
-        public FileCategory Type { get; set; }
-        public long Size { get; set; }
+        public FileCategory Type { get; init; }
+        public long Size { get; init; }
     }
 }

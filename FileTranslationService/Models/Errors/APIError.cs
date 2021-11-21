@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace Tilde.MT.FileTranslationService.Models.Errors
 {
-    public class APIError
+    public record APIError
     {
         [JsonPropertyName("error")]
-        public Error Error { get; set; }
+        public Error Error { get; init; }
     }
 }

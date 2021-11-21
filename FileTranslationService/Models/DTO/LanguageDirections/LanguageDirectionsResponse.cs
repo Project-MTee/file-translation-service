@@ -4,12 +4,12 @@ using Tilde.MT.FileTranslationService.Models.Errors;
 
 namespace Tilde.MT.FileTranslationService.Models.DTO.LanguageDirections
 {
-    public class LanguageDirectionsResponse
+    public record LanguageDirectionsResponse
     {
         [JsonPropertyName("languageDirections")]
-        public IEnumerable<LanguageDirection> LanguageDirections { get; set; }
+        public IEnumerable<LanguageDirection> LanguageDirections { get; init; }
 
         [JsonPropertyName("error")]
-        public Error Error { get; set; }
+        public Error Error { get; init; }
     }
 }
