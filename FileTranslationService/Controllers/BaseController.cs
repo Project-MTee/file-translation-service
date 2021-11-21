@@ -6,7 +6,7 @@ using Tilde.MT.FileTranslationService.Models.Errors;
 
 namespace Tilde.MT.FileTranslationService.Controllers
 {
-    public class APIResponseBaseController: Controller
+    public class BaseController: Controller
     {
         protected ObjectResult FormatAPIError(HttpStatusCode status, ErrorSubCode subcode, HttpStatusCode? messageStatusCode = null)
         {

@@ -23,7 +23,7 @@ namespace Tilde.MT.FileTranslationService.Models.Database
         #region Relations
 
         [JsonIgnore]
-        public virtual Task FileTranslationMetadata { get; set; }
+        public virtual Task Task { get; set; }
 
         #endregion
     }

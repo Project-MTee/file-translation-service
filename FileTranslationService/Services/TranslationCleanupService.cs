@@ -3,13 +3,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Facades;
 using Tilde.MT.FileTranslationService.Models.Configuration;
-using Tilde.MT.FileTranslationService.Models.DTO.Task;
-using System.Linq;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
@@ -51,19 +48,13 @@ namespace Tilde.MT.FileTranslationService.Services
 
                     _logger.LogInformation("Remove expired metadata");
 
-                    var expiredMetadata = await translationFacade.GetExpiredMetadata(
-                        _configurationSettings.UserGroupMetadataExpiration[ReservedMetadataExpirationGroup]
-                    );
+                    var ttl = _configurationSettings.UserGroupMetadataExpiration[ReservedMetadataExpirationGroup];
 
-                    _logger.LogInformation($"Found {expiredMetadata.Count()} expired metadata");
-                    foreach (var metadata in expiredMetadata)
-                    {
-                        await translationFacade.RemoveMetadata(metadata.Id);
-                    }
+                    await translationFacade.RemoveExpiredTasks(ttl);
 
                     _logger.LogInformation("Expired metadata removal completed");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to remove expired metadata");
                 }
@@ -72,7 +63,7 @@ namespace Tilde.MT.FileTranslationService.Services
                 {
                     await System.Threading.Tasks.Task.Delay(workInterval, cancellationToken);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Waiting interruped");
                 }

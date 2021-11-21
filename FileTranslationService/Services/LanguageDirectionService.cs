@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -8,11 +9,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Tilde.MT.FileTranslationService.Exceptions;
+using Tilde.MT.FileTranslationService.Exceptions.LanguageDirection;
 using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.Configuration;
 using Tilde.MT.FileTranslationService.Models.DTO.LanguageDirections;
-using Tilde.MT.FileTranslationService.Models.DTO.Task;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
@@ -24,6 +24,8 @@ namespace Tilde.MT.FileTranslationService.Services
         private readonly ConfigurationServices _serviceConfiguration;
 
         private readonly SemaphoreSlim semaphore = new(1, 1);
+
+        private readonly TimeSpan expiration = TimeSpan.FromHours(1);
 
         public LanguageDirectionService(
             ILogger<LanguageDirectionService> logger,
@@ -38,13 +40,19 @@ namespace Tilde.MT.FileTranslationService.Services
             _serviceConfiguration = serviceConfiguration.Value;
         }
 
-        private async Task<List<LanguageDirection>> Read()
+        /// <summary>
+        /// Fetch language directions from external language direction service or get them from cache
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="LanguageDirectionReadException">Failed to load language directions</exception>
+        private async Task<IEnumerable<LanguageDirection>> Read()
         {
             try
             {
                 await semaphore.WaitAsync();
 
-                if (_cache.Get<List<LanguageDirection>>(MemoryCacheKeys.LanguageDirections) == null)
+
+                var languageDirections = await _cache.GetOrCreateAsync(MemoryCacheKeys.LanguageDirections, async (cacheEntry) =>
                 {
                     var client = _clientFactory.CreateClient();
 
@@ -56,48 +64,52 @@ namespace Tilde.MT.FileTranslationService.Services
 
                     var languageDirections = JsonSerializer.Deserialize<LanguageDirectionsResponse>(jsonString);
 
-                    _cache.Set(MemoryCacheKeys.LanguageDirections, languageDirections.LanguageDirections, TimeSpan.FromHours(1));
-                }
+                    cacheEntry.SetAbsoluteExpiration(expiration);
+
+                    return languageDirections.LanguageDirections;
+                });
+
+                return languageDirections;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to update language directions");
+                throw new LanguageDirectionReadException();
             }
             finally
             {
                 semaphore.Release();
             }
-
-            return _cache.Get<List<LanguageDirection>>(MemoryCacheKeys.LanguageDirections);
         }
 
         /// <summary>
         /// Check if language direction is available
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="domain"></param>
+        /// <param name="sourceLanguage"></param>
+        /// <param name="targetLanguage"></param>
         /// <returns></returns>
-        /// <exception cref="LanguageDirectionsException">Failed to load language directions</exception>
-        public async Task<bool> Validate(NewTask request)
+        /// <exception cref="LanguageDirectionReadException">Failed to load language directions</exception>
+        /// <exception cref="LanguageDirectionNotFoundException">Language direction not found</exception>
+        public async Task Validate(string domain, string sourceLanguage, string targetLanguage)
         {
             var languageDirections = await Read();
 
-            if (languageDirections == null)
-            {
-                throw new LanguageDirectionsException("Failed to load language directions");
-            }
-
             // check if language direction exists.
-            var languageDirectionInSettings = languageDirections.Where(item =>
+            var valid = languageDirections.Any(item =>
             {
-                var languageMatches = item.SourceLanguage == request.SourceLanguage &&
-                    item.TargetLanguage == request.TargetLanguage;
+                var languageMatches = item.SourceLanguage == sourceLanguage &&
+                    item.TargetLanguage == targetLanguage;
 
-                var domainMatches = string.IsNullOrEmpty(request.Domain) || item.Domain == request.Domain;
+                var domainMatches = string.IsNullOrEmpty(domain) || item.Domain == domain;
 
                 return domainMatches && languageMatches;
             });
 
-            return languageDirectionInSettings.Any();
+            if (!valid)
+            {
+                throw new LanguageDirectionNotFoundException(domain, sourceLanguage, targetLanguage);
+            }
         }
     }
 }

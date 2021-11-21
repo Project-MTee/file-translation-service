@@ -9,9 +9,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
-using Tilde.MT.FileTranslationService.Models.DTO.File;
+using Tilde.MT.FileTranslationService.Exceptions.Task;
+using Tilde.MT.FileTranslationService.Facades;
 using Tilde.MT.FileTranslationService.Models.Errors;
-using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Controllers
 {
@@ -20,20 +20,17 @@ namespace Tilde.MT.FileTranslationService.Controllers
     /// </summary>
     [ApiController]
     [Route("file")]
-    public class FileController : APIResponseBaseController
+    public class FileController : BaseController
     {
-        private readonly FileStorageService _fileStorageService;
-        private readonly TaskService _metadataService;
+        private readonly FileTranslationFacade _fileTranslationFacade;
         private readonly ILogger _logger;
 
         public FileController(
-            FileStorageService fileStorageService,
-            TaskService metadataService,
+            FileTranslationFacade fileTranslationFacade,
             ILogger<FileController> logger
         )
         {
-            _fileStorageService = fileStorageService;
-            _metadataService = metadataService;
+            _fileTranslationFacade = fileTranslationFacade;
             _logger = logger;
         }
 
@@ -54,27 +51,33 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
         public async Task<ActionResult> Details(Guid task, Guid file)
         {
-            var linkedFile = await _metadataService.GetLinkedFile(task, file);
-            if (linkedFile == null)
+            try
             {
+                var fileFound = await _fileTranslationFacade.GetFile(task, file);
+
+                if (fileFound.Category == FileCategory.Source)
+                {
+                    if (!User.Identity.IsAuthenticated)
+                    {
+                        return FormatAPIError(HttpStatusCode.Forbidden, ErrorSubCode.GatewaySourceFileDownloadForbidden);
+                    }
+                }
+                var filePath = _fileTranslationFacade.GetFileStoragePath(task, fileFound.Category, fileFound.Extension);
+
+                var provider = new FileExtensionContentTypeProvider();
+                if (!provider.TryGetContentType(filePath, out string contentType))
+                {
+                    contentType = "application/octet-stream";
+                }
+
+                return PhysicalFile(filePath, contentType);
+            }
+            catch (TaskFileNotFoundException ex)
+            {
+                _logger.LogError(ex, "Task file not found");
+
                 return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayFileNotFound);
             }
-            else if (linkedFile.Category.Category == FileCategory.Source)
-            {
-                if (!User.Identity.IsAuthenticated)
-                {
-                    return FormatAPIError(HttpStatusCode.Forbidden, ErrorSubCode.GatewaySourceFileDownloadForbidden);
-                }
-            }
-            var filePath = _fileStorageService.GetPath(task, linkedFile);
-
-            var provider = new FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(filePath, out string contentType))
-            {
-                contentType = "application/octet-stream";
-            }
-
-            return PhysicalFile(filePath, contentType);
         }
 
         /// <summary>
@@ -96,46 +99,26 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
         public async Task<ActionResult> Create(Guid task, FileCategory category, IFormFile file)
         {
-            if (!await _metadataService.Exists(task)) {
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
-            }
-
-            using var fileStream = file.OpenReadStream();
-
-            string extension;
             try
             {
-                extension = await _fileStorageService.Save(
-                    task,
-                    category,
-                    fileStream,
-                    file.FileName
-                );
+                await _fileTranslationFacade.AddFile(task, category, file);
             }
-            catch(FileConflictException ex)
+            catch (TaskNotFoundException ex)
             {
-                // This should normally not happen. 
-                // If translation failed, user can initiate new file translation
-                // This prevents overriding same file 
+                _logger.LogError(ex, "Task not found");
 
+                FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
+            }
+            catch (FileConflictException ex)
+            {
                 _logger.LogError(ex, "File already exists");
                 return FormatAPIError(HttpStatusCode.Conflict, ErrorSubCode.GatewayTaskFileConflict);
             }
-            catch(FileExtensionUnsupportedException ex)
+            catch (FileExtensionUnsupportedException ex)
             {
                 _logger.LogError(ex, "File extension not supported");
                 return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
             }
-
-            await _metadataService.AddLinkedFile(
-                task, 
-                extension,
-                new NewFile()
-                {
-                    Type = category,
-                    Size = fileStream.Length
-                }
-            );
 
             return Ok();
         }

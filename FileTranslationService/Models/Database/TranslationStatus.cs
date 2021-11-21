@@ -26,6 +26,6 @@ namespace Tilde.MT.FileTranslationService.Models.Database
         }
 
         [JsonIgnore]
-        public virtual ICollection<Task> FileTranslationMetadata { get; set; } = new Collection<Task>();
+        public ICollection<Task> Tasks { get; set; } = new Collection<Task>();
     }
 }

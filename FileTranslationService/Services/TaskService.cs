@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Models.Database;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;
@@ -37,7 +36,7 @@ namespace Tilde.MT.FileTranslationService.Services
         public async Task<IEnumerable<Models.Database.File>> GetLinkedFiles(Guid task)
         {
             var metadata = await _dbContext.Files
-                .Where(item => item.FileTranslationMetadata.Id == task)
+                .Where(item => item.Task.Id == task)
                 .Include(item => item.Category)
                 .ToListAsync();
 
@@ -111,6 +110,7 @@ namespace Tilde.MT.FileTranslationService.Services
         public async Task<bool> Exists(Guid task)
         {
             var metadata = await _dbContext.Tasks.FindAsync(task);
+
             return metadata != null;
         }
 
@@ -131,7 +131,7 @@ namespace Tilde.MT.FileTranslationService.Services
         {
             return await _dbContext.Files
                 .Where(item => item.Id == fileId)
-                .Where(item => item.FileTranslationMetadata.Id == task)
+                .Where(item => item.Task.Id == task)
                 .Include(item => item.Category)
                 .FirstOrDefaultAsync();
         }

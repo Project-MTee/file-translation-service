@@ -36,11 +36,12 @@ namespace Tilde.MT.FileTranslationService.Services
         /// Get path of stored file
         /// </summary>
         /// <param name="task"></param>
-        /// <param name="linkedFile"></param>
+        /// <param name="category"></param>
+        /// <param name="extension"></param>
         /// <returns></returns>
-        public string GetPath(Guid task, Models.Database.File linkedFile)
+        public string GetPath(Guid task, Enums.FileCategory category, string extension)
         {
-            var storageName = GetFileStorageName(linkedFile.Category.Category, linkedFile.Extension);
+            var storageName = GetFileStorageName(category, extension);
             return Path.Combine(GetFileTranslationDirectory(task), storageName);
         }
 

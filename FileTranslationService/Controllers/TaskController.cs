@@ -1,15 +1,14 @@
-﻿using MassTransit;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
-using Tilde.MT.FileTranslationService.Exceptions;
 using Tilde.MT.FileTranslationService.Exceptions.File;
+using Tilde.MT.FileTranslationService.Exceptions.LanguageDirection;
+using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Facades;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;
 using Tilde.MT.FileTranslationService.Models.Errors;
@@ -22,29 +21,23 @@ namespace Tilde.MT.FileTranslationService.Controllers
     /// </summary>
     [ApiController]
     [Route("file")]
-    public class TaskController : APIResponseBaseController
+    public class TaskController : BaseController
     {
-        private readonly FileStorageService _fileStorageService;
-        private readonly TaskService _metadataService;
         private readonly FileTranslationFacade _fileTranslationFacade;
-        private readonly IBus _bus;
         private readonly LanguageDirectionService _languageDirectionService;
         private readonly ILogger<TaskController> _logger;
+        private readonly TaskTranslationService _taskTranslationService;
 
         public TaskController(
-            FileStorageService fileStorageService,
-            TaskService metadataService,
+            TaskTranslationService taskTranslationService,
             FileTranslationFacade fileTranslationFacade,
-            IBus bus,
             LanguageDirectionService languageDirectionService,
             ILogger<TaskController> logger
         )
         {
-            _metadataService = metadataService;
-            _fileStorageService = fileStorageService;
             _fileTranslationFacade = fileTranslationFacade;
-            _bus = bus;
             _languageDirectionService = languageDirectionService;
+            _taskTranslationService = taskTranslationService;
             _logger = logger;
         }
 
@@ -55,20 +48,23 @@ namespace Tilde.MT.FileTranslationService.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("{task}")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description ="", Type = typeof(Models.DTO.Task.Task))]
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "", Type = typeof(Models.DTO.Task.Task))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult<Models.DTO.Task.Task>> DetailsAsync(Guid task)
+        public async Task<ActionResult<Models.DTO.Task.Task>> GetAsync(Guid task)
         {
-            if (!await _metadataService.Exists(task))
+            try
             {
+                var result = await _fileTranslationFacade.GetTask(task);
+                return Ok(result);
+            }
+            catch (TaskNotFoundException ex)
+            {
+                _logger.LogError(ex, "Task not found");
+
                 return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
             }
-
-            var metadata = await _metadataService.Get(task);
-
-            return Ok(metadata);
         }
 
         /// <summary>
@@ -87,33 +83,28 @@ namespace Tilde.MT.FileTranslationService.Controllers
         {
             try
             {
-                var valid = await _languageDirectionService.Validate(createTask);
-
-                if (!valid)
-                {
-                    return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayLanguageDirectionNotFound);
-                }
+                await _languageDirectionService.Validate(createTask.Domain, createTask.SourceLanguage, createTask.TargetLanguage);
             }
-            catch (LanguageDirectionsException ex)
+            catch (LanguageDirectionNotFoundException ex)
             {
-                _logger.LogError(ex, "Exception loading language directions");
+                _logger.LogError(ex, "Language direction not found");
+
+                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayLanguageDirectionNotFound);
+            }
+            catch (LanguageDirectionReadException ex)
+            {
+                _logger.LogError(ex, "Failed to load language directions");
 
                 return FormatAPIError(HttpStatusCode.InternalServerError, ErrorSubCode.GatewayLanguageDirectionGeneric);
             }
 
-            using var fileStream = createTask.File.OpenReadStream();
-
-            var metadata = await _metadataService.Create(createTask);
-            string extension = null;
-
             try
             {
-                extension = await _fileStorageService.Save(
-                    metadata.Id,
-                    FileCategory.Source,
-                    fileStream,
-                    createTask.File.FileName
-                );
+                var result = await _fileTranslationFacade.AddTask(createTask);
+
+                await _taskTranslationService.Send(result.Id);
+
+                return Ok(result);
             }
             catch (FileExtensionUnsupportedException ex)
             {
@@ -121,20 +112,12 @@ namespace Tilde.MT.FileTranslationService.Controllers
 
                 return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
             }
-
-            await _metadataService.AddLinkedFile(metadata.Id, extension, new Models.DTO.File.NewFile()
+            catch (FileConflictException ex)
             {
-                Type = FileCategory.Source,
-                Size = fileStream.Length
-            });
+                _logger.LogError(ex, $"File already exists");
 
-            var endpoint = await _bus.GetSendEndpoint(new Uri("queue:file-translation?durable=true"));
-            await endpoint.Send(new Models.RabbitMQ.FileTranslationRequest()
-            {
-                Task = metadata.Id.ToString()
-            });
-
-            return Ok(await _metadataService.Get(metadata.Id));
+                return FormatAPIError(HttpStatusCode.Conflict, ErrorSubCode.GatewayTaskFileConflict);
+            }
         }
 
         /// <summary>
@@ -151,16 +134,20 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult<Models.DTO.Task.Task>> Update(Guid task, TaskUpdate editTask)
+        public async Task<ActionResult> Update(Guid task, TaskUpdate editTask)
         {
-            if (!await _metadataService.Exists(task))
+            try
             {
+                var updatedTask = await _fileTranslationFacade.UpdateTask(task, editTask);
+
+                return Ok(updatedTask);
+            }
+            catch (TaskNotFoundException ex)
+            {
+                _logger.LogError(ex, "Task not found");
+
                 return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
             }
-
-            var metadata = await _metadataService.Update(task, editTask);
-
-            return Ok(metadata);
         }
 
         /// <summary>
@@ -176,14 +163,18 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
         public async Task<ActionResult> Delete(Guid task)
         {
-            if (!await _metadataService.Exists(task))
+            try
             {
+                await _fileTranslationFacade.RemoveTask(task);
+
+                return Ok();
+            }
+            catch (TaskNotFoundException ex)
+            {
+                _logger.LogError(ex, "Task not found");
+
                 return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
             }
-
-            await _fileTranslationFacade.RemoveMetadata(task);
-
-            return Ok();
         }
     }
 }
