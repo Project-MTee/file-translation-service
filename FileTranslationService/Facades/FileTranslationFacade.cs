@@ -61,9 +61,8 @@ namespace Tilde.MT.FileTranslationService.Facades
             using var fileStream = createTask.File.OpenReadStream();
 
             var metadata = await _taskService.Create(createTask);
-            string extension = null;
 
-            extension = await _fileStorageService.Save(
+            var extension = await _fileStorageService.Save(
                 metadata.Id,
                 FileCategory.Source,
                 fileStream,

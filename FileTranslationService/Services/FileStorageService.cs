@@ -59,7 +59,7 @@ namespace Tilde.MT.FileTranslationService.Services
         {
             Directory.CreateDirectory(GetFileTranslationDirectory(task));
 
-            var extension = Path.GetExtension(fileName);
+            var extension = Path.GetExtension(fileName).ToLower();
 
             if (!_configurationSettings.AllowedFileExtensions.Contains(extension))
             {
@@ -100,7 +100,7 @@ namespace Tilde.MT.FileTranslationService.Services
             }
             else
             {
-                _logger.LogWarning($"File marked for deletion is missing: {filePath}");
+                _logger.LogWarning("File marked for deletion is missing: {filePath}", filePath);
             }
 
             if (Directory.Exists(translationDirectory))
@@ -112,7 +112,7 @@ namespace Tilde.MT.FileTranslationService.Services
             }
             else
             {
-                _logger.LogWarning($"Directory marked for deletion is missing: {translationDirectory}");
+                _logger.LogWarning("Directory marked for deletion is missing: {translationDirectory}", translationDirectory);
             }
         }
 
