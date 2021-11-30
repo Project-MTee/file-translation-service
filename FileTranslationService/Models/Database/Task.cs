@@ -39,10 +39,6 @@ namespace Tilde.MT.FileTranslationService.Models.Database
 
         #endregion
 
-        #region Translation status
-
-        #endregion
-
         #region Relations
 
         [JsonIgnore]

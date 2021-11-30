@@ -62,13 +62,13 @@ namespace Tilde.MT.FileTranslationService
             });
             services.AddSingleton(mappingConfig.CreateMapper());
 
-            services.AddScoped<FileStorageService>();
-            services.AddScoped<TaskService>();
-            services.AddScoped<FileTranslationFacade>();
-            services.AddScoped<TaskTranslationService>();
+            services.AddScoped<IFileStorageService, FileStorageService>();
+            services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<IFileTranslationFacade, FileTranslationFacade>();
+            services.AddScoped<ITaskTranslationService, TaskTranslationService>();
 
             services.AddHostedService<TranslationCleanupService>();
-            services.AddSingleton<LanguageDirectionService>();
+            services.AddSingleton<ILanguageDirectionService, LanguageDirectionService>();
 
             services.AddMessaging(Configuration);
 

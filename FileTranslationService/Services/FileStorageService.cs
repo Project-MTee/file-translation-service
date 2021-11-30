@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Models.Configuration;
+using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
     /// <summary>
     /// Store files in Hard drive storage
     /// </summary>
-    public class FileStorageService
+    public class FileStorageService: IFileStorageService
     {
         private readonly ConfigurationSettings _configurationSettings;
         private readonly ILogger _logger;
@@ -39,7 +40,7 @@ namespace Tilde.MT.FileTranslationService.Services
         /// <param name="category"></param>
         /// <param name="extension"></param>
         /// <returns></returns>
-        public string GetPath(Guid task, Enums.FileCategory category, string extension)
+        public string GetPath(Guid task, Enums.FileCategory category, TaskFileExtension extension)
         {
             var storageName = GetFileStorageName(category, extension);
             return Path.Combine(GetFileTranslationDirectory(task), storageName);
@@ -55,15 +56,15 @@ namespace Tilde.MT.FileTranslationService.Services
         /// <returns></returns>
         /// <exception cref="FileExtensionUnsupportedException">File extension is not supported</exception>
         /// <exception cref="FileConflictException">File already exists</exception>
-        public async Task<string> Save(Guid task, FileCategory category, Stream file, string fileName)
+        public async Task<TaskFileExtension> Save(Guid task, FileCategory category, Stream file, string fileName)
         {
             Directory.CreateDirectory(GetFileTranslationDirectory(task));
 
-            var extension = Path.GetExtension(fileName).ToLower();
+            var extension = new TaskFileExtension(Path.GetExtension(fileName).ToLower());
 
-            if (!_configurationSettings.AllowedFileExtensions.Contains(extension))
+            if (!_configurationSettings.AllowedFileExtensions.Contains(extension.Value))
             {
-                throw new FileExtensionUnsupportedException(extension);
+                throw new FileExtensionUnsupportedException(extension.Value);
             }
 
             var storageName = GetFileStorageName(category, extension);
@@ -87,11 +88,12 @@ namespace Tilde.MT.FileTranslationService.Services
         /// Delete current file or delete whole file translation directory if nothing is left
         /// </summary>
         /// <param name="task"></param>
-        /// <param name="fileNameId"></param>
+        /// <param name="category"></param>
+        /// <param name="extension"></param>
         /// <returns></returns>
-        public void Delete(Guid task, Models.Database.File fileNameId)
+        public void Delete(Guid task, FileCategory category, TaskFileExtension extension)
         {
-            var storageName = GetFileStorageName(fileNameId.Category.Category, fileNameId.Extension);
+            var storageName = GetFileStorageName(category, extension);
             var filePath = Path.Combine(GetFileTranslationDirectory(task), storageName);
             var translationDirectory = GetFileTranslationDirectory(task);
             if (File.Exists(filePath))
@@ -120,12 +122,12 @@ namespace Tilde.MT.FileTranslationService.Services
         {
             return $"{_configurationSettings.FileSystemStoragePath}/{task}";
         }
-        private static string GetFileStorageName(FileCategory fileCategory, string safeExtension)
+        private static string GetFileStorageName(FileCategory fileCategory, TaskFileExtension safeExtension)
         {
             // Create unique file name identificator to prevent:
             //      - Directory travel exploit
             //      - File name injections
-            var storageName = $"{fileCategory}.{safeExtension}";
+            var storageName = $"{fileCategory}.{safeExtension.Value}";
 
             return storageName;
         }

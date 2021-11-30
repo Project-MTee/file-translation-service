@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
-    public class TaskTranslationService
+    public class TaskTranslationService: ITaskTranslationService
     {
         private readonly IBus _bus;
 

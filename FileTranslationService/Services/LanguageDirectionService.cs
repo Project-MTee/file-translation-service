@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Exceptions.LanguageDirection;
 using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.Configuration;
-using Tilde.MT.FileTranslationService.Models.DTO.LanguageDirections;
+using Tilde.MT.FileTranslationService.Models.LanguageDirectionService.LanguageDirections;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
-    public class LanguageDirectionService
+    public class LanguageDirectionService: ILanguageDirectionService
     {
         private readonly ILogger _logger;
         private readonly IMemoryCache _cache;

@@ -23,15 +23,15 @@ namespace Tilde.MT.FileTranslationService.Controllers
     [Route("file")]
     public class TaskController : BaseController
     {
-        private readonly FileTranslationFacade _fileTranslationFacade;
-        private readonly LanguageDirectionService _languageDirectionService;
+        private readonly IFileTranslationFacade _fileTranslationFacade;
+        private readonly ILanguageDirectionService _languageDirectionService;
         private readonly ILogger<TaskController> _logger;
-        private readonly TaskTranslationService _taskTranslationService;
+        private readonly ITaskTranslationService _taskTranslationService;
 
         public TaskController(
-            TaskTranslationService taskTranslationService,
-            FileTranslationFacade fileTranslationFacade,
-            LanguageDirectionService languageDirectionService,
+            ITaskTranslationService taskTranslationService,
+            IFileTranslationFacade fileTranslationFacade,
+            ILanguageDirectionService languageDirectionService,
             ILogger<TaskController> logger
         )
         {

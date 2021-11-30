@@ -12,6 +12,7 @@ using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Facades;
 using Tilde.MT.FileTranslationService.Models.Errors;
+using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Controllers
 {
@@ -22,11 +23,11 @@ namespace Tilde.MT.FileTranslationService.Controllers
     [Route("file")]
     public class FileController : BaseController
     {
-        private readonly FileTranslationFacade _fileTranslationFacade;
+        private readonly IFileTranslationFacade _fileTranslationFacade;
         private readonly ILogger _logger;
 
         public FileController(
-            FileTranslationFacade fileTranslationFacade,
+            IFileTranslationFacade fileTranslationFacade,
             ILogger<FileController> logger
         )
         {
@@ -62,9 +63,10 @@ namespace Tilde.MT.FileTranslationService.Controllers
                         return FormatAPIError(HttpStatusCode.Forbidden, ErrorSubCode.GatewaySourceFileDownloadForbidden);
                     }
                 }
-                var filePath = _fileTranslationFacade.GetFileStoragePath(task, fileFound.Category, fileFound.Extension);
+                var filePath = _fileTranslationFacade.GetFileStoragePath(task, fileFound.Category, new TaskFileExtension(fileFound.Extension));
 
                 var provider = new FileExtensionContentTypeProvider();
+         
                 if (!provider.TryGetContentType(filePath, out string contentType))
                 {
                     contentType = "application/octet-stream";

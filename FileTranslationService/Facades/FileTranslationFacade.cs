@@ -6,19 +6,20 @@ using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
+using Tilde.MT.FileTranslationService.Models.ValueObjects;
 using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Facades
 {
-    public class FileTranslationFacade
+    public class FileTranslationFacade: IFileTranslationFacade
     {
-        private readonly FileStorageService _fileStorageService;
-        private readonly TaskService _taskService;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly ITaskService _taskService;
         private readonly IMapper _mapper;
 
         public FileTranslationFacade(
-            FileStorageService fileStorageService,
-            TaskService metadataService,
+            IFileStorageService fileStorageService,
+            ITaskService metadataService,
             IMapper mapper
         )
         {
@@ -43,7 +44,7 @@ namespace Tilde.MT.FileTranslationService.Facades
             var files = await _taskService.GetLinkedFiles(task);
             foreach (var file in files)
             {
-                _fileStorageService.Delete(task, file);
+                _fileStorageService.Delete(task, file.Category, new TaskFileExtension(file.Extension));
             }
 
             await _taskService.Remove(task);
@@ -162,7 +163,7 @@ namespace Tilde.MT.FileTranslationService.Facades
             return fileFound;
         }
 
-        public string GetFileStoragePath(Guid task, Enums.FileCategory category, string extension)
+        public string GetFileStoragePath(Guid task, Enums.FileCategory category, TaskFileExtension extension)
         {
             return _fileStorageService.GetPath(task, category, extension);
         }

@@ -44,7 +44,7 @@ namespace Tilde.MT.FileTranslationService.Services
                 try
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    var translationFacade = scope.ServiceProvider.GetRequiredService<FileTranslationFacade>();
+                    var translationFacade = scope.ServiceProvider.GetRequiredService<IFileTranslationFacade>();
 
                     _logger.LogInformation("Remove expired metadata");
 

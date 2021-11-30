@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Models.Database;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;
+using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
-    public class TaskService
+    public class TaskService: ITaskService
     {
         private readonly TaskDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -33,14 +34,14 @@ namespace Tilde.MT.FileTranslationService.Services
             return metadata.Select(item => _mapper.Map<Models.DTO.Task.Task>(item)).ToList();
         }
 
-        public async Task<IEnumerable<Models.Database.File>> GetLinkedFiles(Guid task)
+        public async Task<IEnumerable<Models.DTO.File.File>> GetLinkedFiles(Guid task)
         {
             var metadata = await _dbContext.Files
                 .Where(item => item.Task.Id == task)
                 .Include(item => item.Category)
                 .ToListAsync();
 
-            return metadata;
+            return metadata.Select(item => _mapper.Map<Models.DTO.File.File>(item));
         }
 
         public async System.Threading.Tasks.Task Remove(Guid task)
@@ -114,12 +115,12 @@ namespace Tilde.MT.FileTranslationService.Services
             return metadata != null;
         }
 
-        public async System.Threading.Tasks.Task AddLinkedFile(Guid task, string extension, NewFile createLinkedFileDTO)
+        public async System.Threading.Tasks.Task AddLinkedFile(Guid task, TaskFileExtension extension, NewFile createLinkedFileDTO)
         {
             var metadata = await _dbContext.Tasks.FindAsync(task);
 
             var linkedFile = _mapper.Map<Models.Database.File>(createLinkedFileDTO);
-            linkedFile.Extension = extension;
+            linkedFile.Extension = extension.Value;
             linkedFile.Category = await _dbContext.FileCategories.FindAsync((int)createLinkedFileDTO.Type);
 
             metadata.Files.Add(linkedFile);
@@ -127,13 +128,15 @@ namespace Tilde.MT.FileTranslationService.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<Models.Database.File> GetLinkedFile(Guid task, Guid fileId)
+        public async Task<Models.DTO.File.File> GetLinkedFile(Guid task, Guid fileId)
         {
-            return await _dbContext.Files
+            var metadata = await _dbContext.Files
                 .Where(item => item.Id == fileId)
                 .Where(item => item.Task.Id == task)
                 .Include(item => item.Category)
                 .FirstOrDefaultAsync();
+
+            return _mapper.Map<Models.DTO.File.File>(metadata);
         }
     }
 }
