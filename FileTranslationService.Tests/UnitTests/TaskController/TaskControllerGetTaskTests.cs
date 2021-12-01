@@ -6,7 +6,7 @@ using Moq;
 using System;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
-using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Xunit;
 

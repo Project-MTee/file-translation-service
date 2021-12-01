@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using Tilde.MT.FileTranslationService.Extensions;
 using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.Configuration;
 using Tilde.MT.FileTranslationService.Models.Mappings;

@@ -6,7 +6,7 @@ using Moq;
 using System;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
-using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Xunit;
 
@@ -16,7 +16,6 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
     {
         private readonly IFileTranslationFacade normalFileTranslationFacade;
         private readonly ILanguageDirectionService normalLanguageDirectionService;
-        private readonly Tilde.MT.FileTranslationService.Models.DTO.Task.TaskUpdate updateTask;
 
         public TaskControllerDeleteTaskTests()
         {
@@ -31,13 +30,6 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
                 .Setup(m => m.Validate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
 
             normalLanguageDirectionService = languageDirectionService.Object;
-
-            updateTask = new Tilde.MT.FileTranslationService.Models.DTO.Task.TaskUpdate()
-            {
-                Segments = 30,
-                SegmentsTranslated = 19,
-                TranslationStatus = Tilde.MT.FileTranslationService.Enums.TranslationStatus.Translating
-            };
         }
 
         [Fact]

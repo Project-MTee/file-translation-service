@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Threading;
-using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Models.Configuration;
 
 namespace Tilde.MT.FileTranslationService.Services

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
-namespace Tilde.MT.FileTranslationService.Facades
+namespace Tilde.MT.FileTranslationService.Interfaces.Facades
 {
     public interface IFileTranslationFacade
     {
@@ -15,6 +15,6 @@ namespace Tilde.MT.FileTranslationService.Facades
         Task RemoveExpiredTasks(TimeSpan ttl);
         Task AddFile(Guid task, FileCategory category, IFormFile file);
         Task<Models.DTO.File.File> GetFile(Guid task, Guid file);
-        string GetFileStoragePath(Guid task, Enums.FileCategory category, TaskFileExtension extension);
+        string GetFileStoragePath(Guid task, FileCategory category, TaskFileExtension extension);
     }
 }

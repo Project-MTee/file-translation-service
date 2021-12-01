@@ -6,7 +6,7 @@ using Moq;
 using System;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
-using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Xunit;
 
@@ -14,27 +14,10 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
 {
     public class TaskControllerUpdateTaskTests
     {
-        private readonly IFileTranslationFacade normalFileTranslationFacade;
         private readonly ILanguageDirectionService normalLanguageDirectionService;
         private readonly Tilde.MT.FileTranslationService.Models.DTO.Task.TaskUpdate updateTask;
         public TaskControllerUpdateTaskTests()
         {
-            var fileTranslationFacade = new Mock<IFileTranslationFacade>();
-            fileTranslationFacade
-                .Setup(m => m.AddTask(It.IsAny<Tilde.MT.FileTranslationService.Models.DTO.Task.NewTask>()))
-                .Returns((Tilde.MT.FileTranslationService.Models.DTO.Task.NewTask task) =>
-                {
-                    return Task.FromResult(new Tilde.MT.FileTranslationService.Models.DTO.Task.Task()
-                    {
-                        Id = Guid.NewGuid(),
-                        Domain = task.Domain,
-                        SourceLanguage = task.SourceLanguage,
-                        TargetLanguage = task.TargetLanguage,
-                        FileName = task.File.FileName
-                    });
-                });
-            normalFileTranslationFacade = fileTranslationFacade.Object;
-
             var languageDirectionService = new Mock<ILanguageDirectionService>();
             languageDirectionService
                 .Setup(m => m.Validate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));

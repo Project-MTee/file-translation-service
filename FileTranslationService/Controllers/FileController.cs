@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
-using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Models.Errors;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
 

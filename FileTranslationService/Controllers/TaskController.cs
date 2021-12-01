@@ -9,7 +9,7 @@ using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.LanguageDirection;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
-using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;
 using Tilde.MT.FileTranslationService.Models.Errors;
