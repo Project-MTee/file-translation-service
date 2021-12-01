@@ -10,9 +10,10 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Exceptions.LanguageDirection;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models;
 using Tilde.MT.FileTranslationService.Models.Configuration;
-using Tilde.MT.FileTranslationService.Models.LanguageDirectionService.LanguageDirections;
+using Tilde.MT.FileTranslationService.Models.External.LanguageDirectionService.LanguageDirections;
 
 namespace Tilde.MT.FileTranslationService.Services
 {

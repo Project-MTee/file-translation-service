@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
-namespace Tilde.MT.FileTranslationService.Services
+namespace Tilde.MT.FileTranslationService.Interfaces.Services
 {
     public interface ITaskService
     {

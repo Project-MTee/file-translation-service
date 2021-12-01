@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using System;
 using System.Threading.Tasks;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
@@ -18,6 +19,7 @@ namespace Tilde.MT.FileTranslationService.Services
         public async Task Send(Guid task)
         {
             var endpoint = await _bus.GetSendEndpoint(new Uri("queue:file-translation?durable=true"));
+
             await endpoint.Send(new Models.RabbitMQ.FileTranslationRequest()
             {
                 Task = task.ToString()

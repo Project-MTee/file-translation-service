@@ -2,12 +2,14 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using Tilde.MT.FileTranslationService.Extensions;
 using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.Configuration;
 using Tilde.MT.FileTranslationService.Models.Mappings;
 using Tilde.MT.FileTranslationService.Services;
@@ -69,6 +71,7 @@ namespace Tilde.MT.FileTranslationService
 
             services.AddHostedService<TranslationCleanupService>();
             services.AddSingleton<ILanguageDirectionService, LanguageDirectionService>();
+            services.AddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider> ();
 
             services.AddMessaging(Configuration);
 

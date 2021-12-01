@@ -25,14 +25,17 @@ namespace Tilde.MT.FileTranslationService.Controllers
     {
         private readonly IFileTranslationFacade _fileTranslationFacade;
         private readonly ILogger _logger;
+        private readonly IContentTypeProvider _contentTypeProvider;
 
         public FileController(
             IFileTranslationFacade fileTranslationFacade,
-            ILogger<FileController> logger
+            ILogger<FileController> logger,
+            IContentTypeProvider contentTypeProvider
         )
         {
             _fileTranslationFacade = fileTranslationFacade;
             _logger = logger;
+            _contentTypeProvider = contentTypeProvider;
         }
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task or File is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult> Details(Guid task, Guid file)
+        public async Task<ActionResult> GetFile(Guid task, Guid file)
         {
             try
             {
@@ -65,9 +68,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
                 }
                 var filePath = _fileTranslationFacade.GetFileStoragePath(task, fileFound.Category, new TaskFileExtension(fileFound.Extension));
 
-                var provider = new FileExtensionContentTypeProvider();
-         
-                if (!provider.TryGetContentType(filePath, out string contentType))
+                if (!_contentTypeProvider.TryGetContentType(filePath, out string contentType))
                 {
                     contentType = "application/octet-stream";
                 }
@@ -99,7 +100,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task or File is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult> Create(Guid task, FileCategory category, IFormFile file)
+        public async Task<ActionResult> CreateFile(Guid task, FileCategory category, IFormFile file)
         {
             try
             {
@@ -109,9 +110,9 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Task not found");
 
-                FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
             }
-            catch (FileConflictException ex)
+            catch (TaskFileConflictException ex)
             {
                 _logger.LogError(ex, "File already exists");
                 return FormatAPIError(HttpStatusCode.Conflict, ErrorSubCode.GatewayTaskFileConflict);

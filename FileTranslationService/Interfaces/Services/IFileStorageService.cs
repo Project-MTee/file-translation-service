@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
-namespace Tilde.MT.FileTranslationService.Services
+namespace Tilde.MT.FileTranslationService.Interfaces.Services
 {
     public interface IFileStorageService
     {

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
-using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Facades
 {
@@ -55,7 +55,7 @@ namespace Tilde.MT.FileTranslationService.Facades
         /// </summary>
         /// <param name="createTask"></param>
         /// <returns></returns>
-        /// <exception cref="FileConflictException"></exception>
+        /// <exception cref="TaskFileConflictException"></exception>
         /// <exception cref="FileExtensionUnsupportedException"></exception>
         public async Task<Models.DTO.Task.Task> AddTask(Models.DTO.Task.NewTask createTask)
         {
@@ -127,7 +127,7 @@ namespace Tilde.MT.FileTranslationService.Facades
         /// <param name="file"></param>
         /// <returns></returns>
         /// <exception cref="TaskNotFoundException"></exception>
-        /// <exception cref="FileConflictException"></exception>
+        /// <exception cref="TaskFileConflictException"></exception>
         /// <exception cref="FileExtensionUnsupportedException"></exception>
         public async Task AddFile(Guid task, FileCategory category, IFormFile file)
         {

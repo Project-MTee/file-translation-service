@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.Database;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;

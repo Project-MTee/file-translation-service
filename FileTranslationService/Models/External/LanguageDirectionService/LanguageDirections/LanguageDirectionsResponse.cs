@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Tilde.MT.FileTranslationService.Models.Errors;
 
-namespace Tilde.MT.FileTranslationService.Models.LanguageDirectionService.LanguageDirections
+namespace Tilde.MT.FileTranslationService.Models.External.LanguageDirectionService.LanguageDirections
 {
     public record LanguageDirectionsResponse
     {

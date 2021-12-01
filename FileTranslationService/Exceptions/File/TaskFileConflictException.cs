@@ -7,9 +7,10 @@ namespace Tilde.MT.FileTranslationService.Exceptions.File
     /// if translation failed, user can initiate new file translation
     /// This prevents overriding same file 
     /// </summary>
-    public class FileConflictException:Exception
+    public class TaskFileConflictException:Exception
     {
-        public FileConflictException(string filePath):base($"Cannot add duplicate file: {filePath}")
+        public TaskFileConflictException(Guid task, string filePath):
+            base($"Cannot add duplicate file for task '{task}', file exists: {filePath}")
         {
 
         }

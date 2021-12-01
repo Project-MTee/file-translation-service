@@ -10,9 +10,9 @@ using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.LanguageDirection;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Facades;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.DTO.Task;
 using Tilde.MT.FileTranslationService.Models.Errors;
-using Tilde.MT.FileTranslationService.Services;
 
 namespace Tilde.MT.FileTranslationService.Controllers
 {
@@ -52,7 +52,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult<Models.DTO.Task.Task>> GetAsync(Guid task)
+        public async Task<ActionResult<Models.DTO.Task.Task>> GetTask(Guid task)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.UnsupportedMediaType, Description = "File type is not supported", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult<Models.DTO.Task.Task>> Create([FromForm] NewTask createTask)
+        public async Task<ActionResult<Models.DTO.Task.Task>> CreateTask([FromForm] NewTask createTask)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
 
                 return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
             }
-            catch (FileConflictException ex)
+            catch (TaskFileConflictException ex)
             {
                 _logger.LogError(ex, $"File already exists");
 
@@ -134,7 +134,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult> Update(Guid task, TaskUpdate editTask)
+        public async Task<ActionResult> UpdateTask(Guid task, TaskUpdate editTask)
         {
             try
             {
@@ -161,7 +161,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, Description = "Task is not found", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Missing or incorrect parameters", Type = typeof(APIError))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "Internal translation error occured", Type = typeof(APIError))]
-        public async Task<ActionResult> Delete(Guid task)
+        public async Task<ActionResult> DeleteTask(Guid task)
         {
             try
             {

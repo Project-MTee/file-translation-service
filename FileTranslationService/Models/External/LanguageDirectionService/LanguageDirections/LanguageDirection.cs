@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Tilde.MT.FileTranslationService.Models.LanguageDirectionService.LanguageDirections
+namespace Tilde.MT.FileTranslationService.Models.External.LanguageDirectionService.LanguageDirections
 {
     public record LanguageDirection
     {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
+using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.Configuration;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
 
@@ -42,8 +43,8 @@ namespace Tilde.MT.FileTranslationService.Services
         /// <returns></returns>
         public string GetPath(Guid task, Enums.FileCategory category, TaskFileExtension extension)
         {
-            var storageName = GetFileStorageName(category, extension);
-            return Path.Combine(GetFileTranslationDirectory(task), storageName);
+            var storageName = GetTaskFileStorageName(category, extension);
+            return Path.Combine(GetTaskFileTranslationDirectory(task), storageName);
         }
 
         /// <summary>
@@ -55,10 +56,10 @@ namespace Tilde.MT.FileTranslationService.Services
         /// <param name="fileName"></param>
         /// <returns></returns>
         /// <exception cref="FileExtensionUnsupportedException">File extension is not supported</exception>
-        /// <exception cref="FileConflictException">File already exists</exception>
+        /// <exception cref="TaskFileConflictException">File already exists</exception>
         public async Task<TaskFileExtension> Save(Guid task, FileCategory category, Stream file, string fileName)
         {
-            Directory.CreateDirectory(GetFileTranslationDirectory(task));
+            Directory.CreateDirectory(GetTaskFileTranslationDirectory(task));
 
             var extension = new TaskFileExtension(Path.GetExtension(fileName).ToLower());
 
@@ -67,13 +68,13 @@ namespace Tilde.MT.FileTranslationService.Services
                 throw new FileExtensionUnsupportedException(extension.Value);
             }
 
-            var storageName = GetFileStorageName(category, extension);
+            var storageName = GetTaskFileStorageName(category, extension);
 
-            var filePath = $"{GetFileTranslationDirectory(task)}/{storageName}";
+            var filePath = $"{GetTaskFileTranslationDirectory(task)}/{storageName}";
 
             if (File.Exists(filePath))
             {
-                throw new FileConflictException(filePath);
+                throw new TaskFileConflictException(task, filePath);
             }
             else
             {
@@ -93,9 +94,8 @@ namespace Tilde.MT.FileTranslationService.Services
         /// <returns></returns>
         public void Delete(Guid task, FileCategory category, TaskFileExtension extension)
         {
-            var storageName = GetFileStorageName(category, extension);
-            var filePath = Path.Combine(GetFileTranslationDirectory(task), storageName);
-            var translationDirectory = GetFileTranslationDirectory(task);
+            var filePath = GetTaskFileLocation(task, category, extension);
+            var translationDirectory = GetTaskFileTranslationDirectory(task);
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -109,7 +109,7 @@ namespace Tilde.MT.FileTranslationService.Services
             {
                 if (!Directory.EnumerateFileSystemEntries(translationDirectory).Any())
                 {
-                    Directory.Delete(GetFileTranslationDirectory(task));
+                    Directory.Delete(GetTaskFileTranslationDirectory(task));
                 }
             }
             else
@@ -118,11 +118,16 @@ namespace Tilde.MT.FileTranslationService.Services
             }
         }
 
-        private string GetFileTranslationDirectory(Guid task)
+        private string GetTaskFileLocation(Guid task, FileCategory category, TaskFileExtension extension)
+        {
+            var storageName = GetTaskFileStorageName(category, extension);
+            return Path.Combine(GetTaskFileTranslationDirectory(task), storageName);
+        }
+        private string GetTaskFileTranslationDirectory(Guid task)
         {
             return $"{_configurationSettings.FileSystemStoragePath}/{task}";
         }
-        private static string GetFileStorageName(FileCategory fileCategory, TaskFileExtension safeExtension)
+        private static string GetTaskFileStorageName(FileCategory fileCategory, TaskFileExtension safeExtension)
         {
             // Create unique file name identificator to prevent:
             //      - Directory travel exploit
