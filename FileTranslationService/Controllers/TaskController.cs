@@ -112,12 +112,6 @@ namespace Tilde.MT.FileTranslationService.Controllers
 
                 return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
             }
-            catch (TaskFileConflictException ex)
-            {
-                _logger.LogError(ex, $"File already exists");
-
-                return FormatAPIError(HttpStatusCode.Conflict, ErrorSubCode.GatewayTaskFileConflict);
-            }
         }
 
         /// <summary>

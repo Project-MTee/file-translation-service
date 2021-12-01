@@ -1,20 +1,16 @@
-﻿using FluentAssertions;
+﻿using FileTranslationService.Tests.Extensions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Facades;
-using Tilde.MT.FileTranslationService.Models.Errors;
 using Tilde.MT.FileTranslationService.Models.ValueObjects;
 using Xunit;
 
@@ -114,11 +110,7 @@ namespace FileTranslationService.Tests.UnitTests.FileController
 
             // --- Assert
 
-            var errorResult = result.Should().BeOfType<ObjectResult>().Subject;
-            var apiResult = errorResult.Value.Should().BeOfType<APIError>().Subject;
-            apiResult.Error.Should().NotBeNull();
-            apiResult.Error.Message.Should().NotBeNullOrEmpty();
-            apiResult.Error.Code.Should().Be(404003);
+            result.ValidateAPIErrorResult(404003);
         }
 
         [Fact]
@@ -160,7 +152,7 @@ namespace FileTranslationService.Tests.UnitTests.FileController
             userIdentity
                 .Setup(m => m.IsAuthenticated)
                 .Returns(false);
-            
+
             var claimsPrincipal = new ClaimsPrincipal(userIdentity.Object);
             var context = new ControllerContext
             {
@@ -185,11 +177,7 @@ namespace FileTranslationService.Tests.UnitTests.FileController
 
             // --- Assert
 
-            var errorResult = result.Should().BeOfType<ObjectResult>().Subject;
-            var apiResult = errorResult.Value.Should().BeOfType<APIError>().Subject;
-            apiResult.Error.Should().NotBeNull();
-            apiResult.Error.Message.Should().NotBeNullOrEmpty();
-            apiResult.Error.Code.Should().Be(403005);
+            result.ValidateAPIErrorResult(403005);
         }
 
         [Fact]

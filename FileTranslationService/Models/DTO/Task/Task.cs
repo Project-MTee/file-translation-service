@@ -68,14 +68,14 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         /// </summary>
         /// <example>0</example>
         [JsonPropertyName("segments")]
-        public int Segments { get; init; }
+        public long Segments { get; init; }
 
         /// <summary>
         /// Count of translated text segmets for translation progress tracking
         /// </summary>
         /// <example>0</example>
         [JsonPropertyName("translatedSegments")]
-        public int SegmentsTranslated { get; init; }
+        public long SegmentsTranslated { get; init; }
 
         [JsonPropertyName("files")]
         public List<File.File> Files { get; init; }

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using FileTranslationService.Tests.Extensions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -7,7 +8,6 @@ using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
-using Tilde.MT.FileTranslationService.Models.Errors;
 using Xunit;
 
 namespace FileTranslationService.Tests.UnitTests.TaskController
@@ -75,11 +75,7 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
 
             // --- Assert
 
-            var objectResult = result.Result.Should().BeOfType<ObjectResult>().Subject;
-            var apiResult = objectResult.Value.Should().BeOfType<APIError>().Subject;
-            apiResult.Error.Should().NotBeNull();
-            apiResult.Error.Message.Should().NotBeNullOrEmpty();
-            apiResult.Error.Code.Should().Be(404002);
+            result.ValidateAPIErrorResult(404002);
         }
     }
 }
