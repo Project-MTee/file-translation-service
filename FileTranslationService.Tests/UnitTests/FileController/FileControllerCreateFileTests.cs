@@ -29,7 +29,7 @@ namespace FileTranslationService.Tests.UnitTests.FileController
         }
 
         [Fact]
-        public async Task FileIsReturned_WhenUserInputValid()
+        public async Task TaskIsCreated_WhenUserInputValid()
         {
             // --- Arrange
 

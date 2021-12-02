@@ -33,7 +33,7 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
         }
 
         [Fact]
-        public async Task TaskIsReturned_WhenTaskIsFound()
+        public async Task TaskIsDeleted_WhenTaskIsFound()
         {
             // --- Arrange
 
