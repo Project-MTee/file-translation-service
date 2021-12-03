@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 
-namespace Tilde.MT.FileTranslationService.Models.ValueObjects
+namespace Tilde.MT.FileTranslationService.ValueObjects
 {
     public record TaskFileExtension
     {
@@ -14,7 +14,7 @@ namespace Tilde.MT.FileTranslationService.Models.ValueObjects
             {
                 throw new FileExtensionUnsafeException(extension);
             }
-            
+
             Value = extension;
         }
     }

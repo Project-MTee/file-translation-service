@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Tilde.MT.FileTranslationService.Enums;
 
 namespace Tilde.MT.FileTranslationService.Models.Database
 {
@@ -23,7 +24,7 @@ namespace Tilde.MT.FileTranslationService.Models.Database
         #region Relations
 
         [JsonIgnore]
-        public virtual Task Task { get; set; }
+        public Task Task { get; set; }
 
         #endregion
     }

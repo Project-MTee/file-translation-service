@@ -63,7 +63,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Task not found");
 
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, GatewayErrorSubcode.GatewayTaskNotFound);
             }
         }
 
@@ -89,13 +89,13 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Language direction not found");
 
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayLanguageDirectionNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, GatewayErrorSubcode.GatewayLanguageDirectionNotFound);
             }
             catch (LanguageDirectionReadException ex)
             {
                 _logger.LogError(ex, "Failed to load language directions");
 
-                return FormatAPIError(HttpStatusCode.InternalServerError, ErrorSubCode.GatewayLanguageDirectionGeneric);
+                return FormatAPIError(HttpStatusCode.InternalServerError, GatewayErrorSubcode.GatewayLanguageDirectionGeneric);
             }
 
             try
@@ -110,7 +110,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, $"File extension is not supported");
 
-                return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
+                return FormatAPIError(HttpStatusCode.UnsupportedMediaType, GatewayErrorSubcode.GatewayMediaTypeNotValid);
             }
         }
 
@@ -140,7 +140,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Task not found");
 
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, GatewayErrorSubcode.GatewayTaskNotFound);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Task not found");
 
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, GatewayErrorSubcode.GatewayTaskNotFound);
             }
         }
     }

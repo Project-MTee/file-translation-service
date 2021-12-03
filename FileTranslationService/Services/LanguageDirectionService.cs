@@ -83,15 +83,6 @@ namespace Tilde.MT.FileTranslationService.Services
             }
         }
 
-        /// <summary>
-        /// Check if language direction is available
-        /// </summary>
-        /// <param name="domain"></param>
-        /// <param name="sourceLanguage"></param>
-        /// <param name="targetLanguage"></param>
-        /// <returns></returns>
-        /// <exception cref="LanguageDirectionReadException">Failed to load language directions</exception>
-        /// <exception cref="LanguageDirectionNotFoundException">Language direction not found</exception>
         public async Task Validate(string domain, string sourceLanguage, string targetLanguage)
         {
             var languageDirections = await Read();

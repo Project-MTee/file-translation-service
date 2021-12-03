@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using Tilde.MT.FileTranslationService.Enums;
 
 namespace Tilde.MT.FileTranslationService.Models.Database
 {
@@ -34,6 +34,8 @@ namespace Tilde.MT.FileTranslationService.Models.Database
 
         #region Statistics
 
+        public TranslationStatus TranslationStatus { get; set; }
+        public TranslationStatusSubCode TranslationStatusSubCode { get; set; }
         public long Segments { get; set; }
         public long SegmentsTranslated { get; set; }
 
@@ -41,11 +43,7 @@ namespace Tilde.MT.FileTranslationService.Models.Database
 
         #region Relations
 
-        [JsonIgnore]
-        public virtual TranslationStatus TranslationStatus { get; set; }
-
-        [JsonIgnore]
-        public virtual ICollection<File> Files { get; set; } = new Collection<File>();
+        public ICollection<File> Files { get; set; } = new Collection<File>();
 
         #endregion
     }

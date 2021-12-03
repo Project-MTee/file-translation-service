@@ -12,7 +12,7 @@ using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Models.Errors;
-using Tilde.MT.FileTranslationService.Models.ValueObjects;
+using Tilde.MT.FileTranslationService.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Controllers
 {
@@ -63,7 +63,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
                 {
                     if (!User.Identity.IsAuthenticated)
                     {
-                        return FormatAPIError(HttpStatusCode.Forbidden, ErrorSubCode.GatewaySourceFileDownloadForbidden);
+                        return FormatAPIError(HttpStatusCode.Forbidden, GatewayErrorSubcode.GatewaySourceFileDownloadForbidden);
                     }
                 }
                 var filePath = _fileTranslationFacade.GetFileStoragePath(task, fileFound.Category, new TaskFileExtension(fileFound.Extension));
@@ -79,7 +79,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Task file not found");
 
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayFileNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, GatewayErrorSubcode.GatewayFileNotFound);
             }
         }
 
@@ -110,17 +110,17 @@ namespace Tilde.MT.FileTranslationService.Controllers
             {
                 _logger.LogError(ex, "Task not found");
 
-                return FormatAPIError(HttpStatusCode.NotFound, ErrorSubCode.GatewayTaskNotFound);
+                return FormatAPIError(HttpStatusCode.NotFound, GatewayErrorSubcode.GatewayTaskNotFound);
             }
             catch (TaskFileConflictException ex)
             {
                 _logger.LogError(ex, "File already exists");
-                return FormatAPIError(HttpStatusCode.Conflict, ErrorSubCode.GatewayTaskFileConflict);
+                return FormatAPIError(HttpStatusCode.Conflict, GatewayErrorSubcode.GatewayTaskFileConflict);
             }
             catch (FileExtensionUnsupportedException ex)
             {
                 _logger.LogError(ex, "File extension not supported");
-                return FormatAPIError(HttpStatusCode.UnsupportedMediaType, ErrorSubCode.GatewayMediaTypeNotValid);
+                return FormatAPIError(HttpStatusCode.UnsupportedMediaType, GatewayErrorSubcode.GatewayMediaTypeNotValid);
             }
 
             return Ok();

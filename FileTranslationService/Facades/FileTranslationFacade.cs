@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
@@ -8,7 +9,7 @@ using Tilde.MT.FileTranslationService.Exceptions.Task;
 using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
-using Tilde.MT.FileTranslationService.Models.ValueObjects;
+using Tilde.MT.FileTranslationService.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Facades
 {
@@ -16,25 +17,16 @@ namespace Tilde.MT.FileTranslationService.Facades
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ITaskService _taskService;
-        private readonly IMapper _mapper;
 
         public FileTranslationFacade(
             IFileStorageService fileStorageService,
-            ITaskService metadataService,
-            IMapper mapper
+            ITaskService metadataService
         )
         {
             _fileStorageService = fileStorageService;
             _taskService = metadataService;
-            _mapper = mapper;
         }
-
-        /// <summary>
-        /// Remove specific task and associated data
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        /// <exception cref="TaskNotFoundException">Task not found</exception>
+        
         public async Task RemoveTask(Guid task)
         {
             if (!await _taskService.Exists(task))
@@ -42,8 +34,8 @@ namespace Tilde.MT.FileTranslationService.Facades
                 throw new TaskNotFoundException(task);
             }
 
-            var files = await _taskService.GetLinkedFiles(task);
-            foreach (var file in files)
+            var taskFound = await _taskService.Get(task);
+            foreach (var file in taskFound.Files)
             {
                 _fileStorageService.Delete(task, file.Category, new TaskFileExtension(file.Extension));
             }
@@ -51,18 +43,11 @@ namespace Tilde.MT.FileTranslationService.Facades
             await _taskService.Remove(task);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="createTask"></param>
-        /// <returns></returns>
-        /// <exception cref="TaskFileConflictException"></exception>
-        /// <exception cref="FileExtensionUnsupportedException"></exception>
         public async Task<Models.DTO.Task.Task> AddTask(Models.DTO.Task.NewTask createTask)
         {
             using var fileStream = createTask.File.OpenReadStream();
 
-            var metadata = await _taskService.Create(createTask);
+            var metadata = await _taskService.Add(createTask);
 
             var extension = await _fileStorageService.Save(
                 metadata.Id,
@@ -71,9 +56,9 @@ namespace Tilde.MT.FileTranslationService.Facades
                 createTask.File.FileName
             );
                 
-            await _taskService.AddLinkedFile(metadata.Id, extension, new Models.DTO.File.NewFile()
+            await _taskService.AddFileToTask(metadata.Id, extension, new Models.DTO.File.NewFile()
             {
-                Type = FileCategory.Source,
+                Category = FileCategory.Source,
                 Size = fileStream.Length
             });
 
@@ -104,12 +89,6 @@ namespace Tilde.MT.FileTranslationService.Facades
             return metadata;
         }
 
-        /// <summary>
-        /// Remove all tasks that are expired
-        /// </summary>
-        /// <param name="ttl"></param>
-        /// <returns></returns>
-        /// <exception cref="TaskNotFoundException"></exception>
         public async Task RemoveExpiredTasks(TimeSpan ttl)
         {
             var expiredMetadata = await _taskService.GetExpired(ttl);
@@ -120,16 +99,6 @@ namespace Tilde.MT.FileTranslationService.Facades
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="task"></param>
-        /// <param name="category"></param>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        /// <exception cref="TaskNotFoundException"></exception>
-        /// <exception cref="TaskFileConflictException"></exception>
-        /// <exception cref="FileExtensionUnsupportedException"></exception>
         public async Task AddFile(Guid task, FileCategory category, IFormFile file)
         {
             if (!await _taskService.Exists(task))
@@ -141,27 +110,27 @@ namespace Tilde.MT.FileTranslationService.Facades
 
             var extension = await _fileStorageService.Save(task, category, fileStream, file.FileName);
 
-            await _taskService.AddLinkedFile(
+            await _taskService.AddFileToTask(
                 task,
                 extension,
                 new NewFile()
                 {
-                    Type = category,
+                    Category = category,
                     Size = fileStream.Length
                 }
             );
         }
 
-        public async Task<Models.DTO.File.File> GetFile(Guid task, Guid file)
+        public async Task<File> GetFile(Guid task, Guid file)
         {
-            var linkedFile = await _taskService.GetLinkedFile(task, file);
-            if (linkedFile == null)
+            var foundFile = (await _taskService.Get(task))?.Files.Where(item => item.Id == file).FirstOrDefault();
+
+            if (foundFile == null)
             {
                 throw new TaskFileNotFoundException(task, file);
             }
 
-            var fileFound = _mapper.Map<Models.DTO.File.File>(linkedFile);
-            return fileFound;
+            return foundFile;
         }
 
         public string GetFileStoragePath(Guid task, Enums.FileCategory category, TaskFileExtension extension)

@@ -11,8 +11,6 @@ namespace Tilde.MT.FileTranslationService.Models.Database
     {
         public DbSet<Task> Tasks { get; set; }
         public DbSet<File> Files { get; set; }
-        public DbSet<TranslationStatus> TranslationStatuses { get; set; }
-        public DbSet<FileCategory> FileCategories { get; set; }
 
         public TaskDbContext(DbContextOptions<TaskDbContext> options) : base(options)
         {
@@ -21,31 +19,7 @@ namespace Tilde.MT.FileTranslationService.Models.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            #region Seed database
-
-            foreach (var status in (Enums.TranslationStatus[])Enum.GetValues(typeof(Enums.TranslationStatus)))
-            {
-                modelBuilder.Entity<TranslationStatus>().HasData(
-                    new TranslationStatus
-                    {
-                        Id = (int)status,
-                        Description = status.ToString()
-                    }
-                );
-            }
-
-            foreach (var status in (Enums.FileCategory[])Enum.GetValues(typeof(Enums.FileCategory)))
-            {
-                modelBuilder.Entity<FileCategory>().HasData(
-                    new FileCategory
-                    {
-                        Id = (int)status,
-                        Description = status.ToString()
-                    }
-                );
-            }
-
-            #endregion
+            
         }
 
         public override int SaveChanges()

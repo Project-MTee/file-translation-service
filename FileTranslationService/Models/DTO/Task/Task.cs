@@ -64,6 +64,12 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         public TranslationStatus TranslationStatus { get; init; }
 
         /// <summary>
+        /// Substatus code that describes 'status' code
+        /// </summary>
+        [JsonPropertyName("substatus")]
+        public TranslationStatusSubCode TranslationStatusSubCode { get; set; }
+
+        /// <summary>
         /// Count of text segments in the source file
         /// </summary>
         /// <example>0</example>

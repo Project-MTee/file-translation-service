@@ -2,7 +2,7 @@
 
 namespace Tilde.MT.FileTranslationService.Enums
 {
-    public enum ErrorSubCode
+    public enum GatewayErrorSubcode
     {
         #region Task errors
 

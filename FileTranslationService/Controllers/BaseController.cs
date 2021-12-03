@@ -8,7 +8,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
 {
     public class BaseController: Controller
     {
-        protected ObjectResult FormatAPIError(HttpStatusCode status, ErrorSubCode subcode, HttpStatusCode? messageStatusCode = null)
+        protected ObjectResult FormatAPIError(HttpStatusCode status, GatewayErrorSubcode subcode, HttpStatusCode? messageStatusCode = null)
         {
             return StatusCode(
                 (int)status,

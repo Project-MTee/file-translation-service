@@ -39,8 +39,8 @@ namespace Tilde.MT.FileTranslationService.Extensions
                             {
                                 Error = new Error()
                                 {
-                                    Code = ((int)HttpStatusCode.RequestEntityTooLarge) * 1000 + (int)Enums.ErrorSubCode.GatewayRequestTooLarge,
-                                    Message = Enums.ErrorSubCode.GatewayRequestTooLarge.Description()
+                                    Code = ((int)HttpStatusCode.RequestEntityTooLarge) * 1000 + (int)Enums.GatewayErrorSubcode.GatewayRequestTooLarge,
+                                    Message = Enums.GatewayErrorSubcode.GatewayRequestTooLarge.Description()
                                 }
                             }
                         );
@@ -52,8 +52,8 @@ namespace Tilde.MT.FileTranslationService.Extensions
                             {
                                 Error = new Error()
                                 {
-                                    Code = ((int)HttpStatusCode.BadRequest) * 1000 + (int)Enums.ErrorSubCode.GatewayRequestValidation,
-                                    Message = Enums.ErrorSubCode.GatewayRequestValidation.Description()
+                                    Code = ((int)HttpStatusCode.BadRequest) * 1000 + (int)Enums.GatewayErrorSubcode.GatewayRequestValidation,
+                                    Message = Enums.GatewayErrorSubcode.GatewayRequestValidation.Description()
                                 }
                             }
                         );
@@ -92,8 +92,8 @@ namespace Tilde.MT.FileTranslationService.Extensions
                             {
                                 Error = new Error()
                                 {
-                                    Code = ((int)HttpStatusCode.RequestEntityTooLarge) * 1000 + (int)Enums.ErrorSubCode.GatewayRequestTooLarge,
-                                    Message = Enums.ErrorSubCode.GatewayRequestTooLarge.Description()
+                                    Code = ((int)HttpStatusCode.RequestEntityTooLarge) * 1000 + (int)Enums.GatewayErrorSubcode.GatewayRequestTooLarge,
+                                    Message = Enums.GatewayErrorSubcode.GatewayRequestTooLarge.Description()
                                 }
                             });
                         }
@@ -104,8 +104,8 @@ namespace Tilde.MT.FileTranslationService.Extensions
                             {
                                 Error = new Error()
                                 {
-                                    Code = ((int)HttpStatusCode.InternalServerError) * 1000 + (int)Enums.ErrorSubCode.GatewayGeneric,
-                                    Message = Enums.ErrorSubCode.GatewayGeneric.Description()
+                                    Code = ((int)HttpStatusCode.InternalServerError) * 1000 + (int)Enums.GatewayErrorSubcode.GatewayGeneric,
+                                    Message = Enums.GatewayErrorSubcode.GatewayGeneric.Description()
                                 }
                             });
                         }

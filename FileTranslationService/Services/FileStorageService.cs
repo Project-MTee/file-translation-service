@@ -8,7 +8,7 @@ using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.Configuration;
-using Tilde.MT.FileTranslationService.Models.ValueObjects;
+using Tilde.MT.FileTranslationService.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
@@ -20,11 +20,6 @@ namespace Tilde.MT.FileTranslationService.Services
         private readonly ConfigurationSettings _configurationSettings;
         private readonly ILogger _logger;
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="configurationSettings"></param>
         public FileStorageService(
             ILogger<FileStorageService> logger,
             IOptions<ConfigurationSettings> configurationSettings
@@ -34,29 +29,12 @@ namespace Tilde.MT.FileTranslationService.Services
             _configurationSettings = configurationSettings.Value;
         }
 
-        /// <summary>
-        /// Get path of stored file
-        /// </summary>
-        /// <param name="task"></param>
-        /// <param name="category"></param>
-        /// <param name="extension"></param>
-        /// <returns></returns>
         public string GetPath(Guid task, Enums.FileCategory category, TaskFileExtension extension)
         {
             var storageName = GetTaskFileStorageName(category, extension);
             return Path.Combine(GetTaskFileTranslationDirectory(task), storageName);
         }
 
-        /// <summary>
-        /// Store single file
-        /// </summary>
-        /// <param name="task"></param>
-        /// <param name="category"></param>
-        /// <param name="file"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        /// <exception cref="FileExtensionUnsupportedException">File extension is not supported</exception>
-        /// <exception cref="TaskFileConflictException">File already exists</exception>
         public async Task<TaskFileExtension> Save(Guid task, FileCategory category, Stream file, string fileName)
         {
             Directory.CreateDirectory(GetTaskFileTranslationDirectory(task));
@@ -85,13 +63,6 @@ namespace Tilde.MT.FileTranslationService.Services
             }
         }
 
-        /// <summary>
-        /// Delete current file or delete whole file translation directory if nothing is left
-        /// </summary>
-        /// <param name="task"></param>
-        /// <param name="category"></param>
-        /// <param name="extension"></param>
-        /// <returns></returns>
         public void Delete(Guid task, FileCategory category, TaskFileExtension extension)
         {
             var filePath = GetTaskFileLocation(task, category, extension);
