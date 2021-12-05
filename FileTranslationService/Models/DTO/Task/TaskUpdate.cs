@@ -21,7 +21,7 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         public TranslationStatus TranslationStatus { get; init; }
 
         [JsonPropertyName("substatus")]
-        public TranslationStatusSubCode TranslationStatusSubCode { get; set; }
+        public TranslationSubstatus TranslationSubstatus { get; set; }
 
         #endregion
     }

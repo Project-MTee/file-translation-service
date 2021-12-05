@@ -35,7 +35,7 @@ namespace Tilde.MT.FileTranslationService.Models.Database
         #region Statistics
 
         public TranslationStatus TranslationStatus { get; set; }
-        public TranslationStatusSubCode TranslationStatusSubCode { get; set; }
+        public TranslationSubstatus TranslationSubstatus { get; set; }
         public long Segments { get; set; }
         public long SegmentsTranslated { get; set; }
 

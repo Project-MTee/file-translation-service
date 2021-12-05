@@ -7,7 +7,7 @@ namespace Tilde.MT.FileTranslationService.Models.Errors
         /// <summary>
         /// Error code
         /// </summary>
-        /// <example>500</example>
+        /// <example>404007</example>
         [JsonPropertyName("code")]
         public int Code { get; init; }
 
