@@ -40,8 +40,33 @@ If user wants to translate file, task is submitted to file translation workers v
 |      File translation worker      |
 |                                   |
  ------------------------------------
-
 ```
+
+### File translation via RabbitMQ:
+
+> exchange created automatically on demand
+
+
+| Parameter           | Value                                                                             |
+| ------------------- | --------------------------------------------------------------------------------- |
+| exchange            | file-translation                                                                  |
+| exchange type       | fanout                                                                            |
+| exchange options    | durable                                                                           |
+
+# Monitor
+
+## Healthcheck probes
+
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+Startup probe / Readiness probe:
+
+`/health/ready`
+
+Liveness probe:
+
+`/health/live`
+
 
 # Development tools
 
@@ -49,13 +74,6 @@ If user wants to translate file, task is submitted to file translation workers v
 
 ```Bash
 dotnet tool install --global dotnet-ef
-```
-
-# Build
-
-Using docker
-```Shell
-docker build -f ./FileTranslationService/Dockerfile -t file-translation-service .
 ```
 
 # Test
