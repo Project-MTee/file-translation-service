@@ -15,12 +15,12 @@ namespace Tilde.MT.FileTranslationService.Interfaces.Services
         /// <param name="task"></param>
         /// <param name="category"></param>
         /// <param name="file"></param>
-        /// <param name="fileName"></param>
+        /// <param name="extension"></param>
         /// <returns></returns>
         /// <exception cref="TaskFileConflictException">File already exists</exception>
         /// <exception cref="FileExtensionUnsupportedException">File exception is not supported</exception>
-        Task<TaskFileExtension> Save(Guid task, FileCategory category, Stream file, string fileName);
         
+        Task Save(Guid task, FileCategory category, Stream file, TaskFileExtension extension);
         /// <summary>
         /// Delete file from storage
         /// </summary>

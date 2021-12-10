@@ -9,7 +9,7 @@ using Tilde.MT.FileTranslationService.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
-    public class TaskService: ITaskService
+    public class TaskService : ITaskService
     {
         private readonly Models.Database.TaskDbContext _dbContext;
         private readonly IMapper _mapper;

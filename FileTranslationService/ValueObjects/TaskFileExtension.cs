@@ -15,7 +15,7 @@ namespace Tilde.MT.FileTranslationService.ValueObjects
                 throw new FileExtensionUnsafeException(extension);
             }
 
-            Value = extension;
+            Value = extension.ToLower();
         }
     }
 }

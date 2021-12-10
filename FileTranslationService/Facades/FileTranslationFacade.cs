@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Tilde.MT.FileTranslationService.Enums;
 using Tilde.MT.FileTranslationService.Exceptions.File;
 using Tilde.MT.FileTranslationService.Exceptions.Task;
+using Tilde.MT.FileTranslationService.Extensions;
 using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Interfaces.Services;
 using Tilde.MT.FileTranslationService.Models.DTO.File;
@@ -13,7 +13,7 @@ using Tilde.MT.FileTranslationService.ValueObjects;
 
 namespace Tilde.MT.FileTranslationService.Facades
 {
-    public class FileTranslationFacade: IFileTranslationFacade
+    public class FileTranslationFacade : IFileTranslationFacade
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ITaskService _taskService;
@@ -26,7 +26,7 @@ namespace Tilde.MT.FileTranslationService.Facades
             _fileStorageService = fileStorageService;
             _taskService = metadataService;
         }
-        
+
         public async Task RemoveTask(Guid task)
         {
             if (!await _taskService.Exists(task))
@@ -49,13 +49,15 @@ namespace Tilde.MT.FileTranslationService.Facades
 
             var metadata = await _taskService.Add(createTask);
 
-            var extension = await _fileStorageService.Save(
+            var extension = createTask.File.FileName.GetTaskFileExtension();
+
+            await _fileStorageService.Save(
                 metadata.Id,
                 FileCategory.Source,
                 fileStream,
-                createTask.File.FileName
+                extension
             );
-                
+
             await _taskService.AddFileToTask(metadata.Id, extension, new Models.DTO.File.NewFile()
             {
                 Category = FileCategory.Source,
@@ -108,7 +110,9 @@ namespace Tilde.MT.FileTranslationService.Facades
 
             using var fileStream = file.OpenReadStream();
 
-            var extension = await _fileStorageService.Save(task, category, fileStream, file.FileName);
+            var extension = file.FileName.GetTaskFileExtension();
+
+            await _fileStorageService.Save(task, category, fileStream, extension);
 
             await _taskService.AddFileToTask(
                 task,

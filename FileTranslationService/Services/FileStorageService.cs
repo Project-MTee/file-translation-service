@@ -15,7 +15,7 @@ namespace Tilde.MT.FileTranslationService.Services
     /// <summary>
     /// Store files in Hard drive storage
     /// </summary>
-    public class FileStorageService: IFileStorageService
+    public class FileStorageService : IFileStorageService
     {
         private readonly ConfigurationSettings _configurationSettings;
         private readonly ILogger _logger;
@@ -35,11 +35,9 @@ namespace Tilde.MT.FileTranslationService.Services
             return Path.Combine(GetTaskFileTranslationDirectory(task), storageName);
         }
 
-        public async Task<TaskFileExtension> Save(Guid task, FileCategory category, Stream file, string fileName)
+        public async Task Save(Guid task, FileCategory category, Stream file, TaskFileExtension extension)
         {
             Directory.CreateDirectory(GetTaskFileTranslationDirectory(task));
-
-            var extension = new TaskFileExtension(Path.GetExtension(fileName).ToLower());
 
             if (!_configurationSettings.AllowedFileExtensions.Contains(extension.Value))
             {
@@ -58,8 +56,6 @@ namespace Tilde.MT.FileTranslationService.Services
             {
                 using var translationFile = File.Create(filePath);
                 await file.CopyToAsync(translationFile);
-
-                return extension;
             }
         }
 

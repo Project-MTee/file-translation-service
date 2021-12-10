@@ -29,21 +29,21 @@ namespace Tilde.MT.FileTranslationService.Interfaces.Services
         /// <param name="createLinkedFileDTO"></param>
         /// <returns></returns>
         Task AddFileToTask(Guid task, TaskFileExtension extension, Models.DTO.File.NewFile createLinkedFileDTO);
-        
+
         /// <summary>
         /// Add new task
         /// </summary>
         /// <param name="createTask"></param>
         /// <returns></returns>
         Task<Models.DTO.Task.Task> Add(Models.DTO.Task.NewTask createTask);
-        
+
         /// <summary>
         /// Get task
         /// </summary>
         /// <param name="task"></param>
         /// <returns></returns>
         Task<Models.DTO.Task.Task> Get(Guid task);
-        
+
         /// <summary>
         /// Update task
         /// </summary>
@@ -51,7 +51,7 @@ namespace Tilde.MT.FileTranslationService.Interfaces.Services
         /// <param name="editTask"></param>
         /// <returns></returns>
         Task<Models.DTO.Task.Task> Update(Guid task, Models.DTO.Task.TaskUpdate editTask);
-        
+
         /// <summary>
         /// Get expired tasks
         /// </summary>
