@@ -50,9 +50,9 @@ namespace Tilde.MT.FileTranslationService.Services
             var metadata = await _dbContext.Tasks
                 .Where(item => item.Id == task)
                 .Include(item => item.Files)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
-            return _mapper.Map<Models.DTO.Task.Task>(metadata);
+            return metadata == null ? null : _mapper.Map<Models.DTO.Task.Task>(metadata);
         }
 
         public async Task<Models.DTO.Task.Task> Add(Models.DTO.Task.NewTask createTask)
