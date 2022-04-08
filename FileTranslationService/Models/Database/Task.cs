@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Tilde.MT.FileTranslationService.Enums;
 
 namespace Tilde.MT.FileTranslationService.Models.Database
@@ -10,7 +9,6 @@ namespace Tilde.MT.FileTranslationService.Models.Database
     public class Task : IDbEntityTimestamps
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [MaxLength(300)]

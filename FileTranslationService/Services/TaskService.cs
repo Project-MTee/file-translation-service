@@ -58,6 +58,7 @@ namespace Tilde.MT.FileTranslationService.Services
         public async Task<Models.DTO.Task.Task> Add(Models.DTO.Task.NewTask createTask)
         {
             var metadata = _mapper.Map<Models.Database.Task>(createTask);
+            metadata.Id = Guid.NewGuid();
             metadata.TranslationStatus = Enums.TranslationStatus.Queuing;
             _dbContext.Tasks.Add(metadata);
 
@@ -91,9 +92,12 @@ namespace Tilde.MT.FileTranslationService.Services
             var metadata = await _dbContext.Tasks.FindAsync(task);
 
             var linkedFile = _mapper.Map<Models.Database.File>(createLinkedFileDTO);
+            linkedFile.Id = Guid.NewGuid();
             linkedFile.Extension = extension.Value;
 
-            metadata.Files.Add(linkedFile);
+            var file = await _dbContext.Files.AddAsync(linkedFile);
+
+            metadata.Files.Add(file.Entity);
 
             await _dbContext.SaveChangesAsync();
         }
