@@ -54,13 +54,14 @@ namespace Tilde.MT.FileTranslationService.Extensions
 
                     config.ConfigureEndpoints(context);
 
-                    config.UseRawJsonSerializer(
-                        MassTransit.Serialization.RawJsonSerializerOptions.AddTransportHeaders
-                    );
+                    config.UseRawJsonSerializer(MassTransit.Serialization.RawSerializerOptions.AddTransportHeaders);
                 });
             });
 
-            services.AddMassTransitHostedService(false);
+            services.Configure<MassTransitHostOptions>(options =>
+            {
+                options.WaitUntilStarted = false;
+            });
 
             return services;
         }
