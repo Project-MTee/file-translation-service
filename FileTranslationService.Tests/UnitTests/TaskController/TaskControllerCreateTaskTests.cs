@@ -40,8 +40,7 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
                         Id = Guid.NewGuid(),
                         Domain = task.Domain,
                         SourceLanguage = task.SourceLanguage,
-                        TargetLanguage = task.TargetLanguage,
-                        FileName = task.File.FileName
+                        TargetLanguage = task.TargetLanguage
                     });
                 });
             normalFileTranslationFacade = fileTranslationFacade.Object;
@@ -80,7 +79,6 @@ namespace FileTranslationService.Tests.UnitTests.TaskController
             {
                 return options.Excluding(item => item.File);
             });
-            taskResult.FileName.Should().Be(newTask.File.FileName);
         }
 
         [Fact]
