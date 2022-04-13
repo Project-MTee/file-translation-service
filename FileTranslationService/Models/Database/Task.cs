@@ -11,9 +11,6 @@ namespace Tilde.MT.FileTranslationService.Models.Database
         [Key]
         public Guid Id { get; set; }
 
-        [MaxLength(300)]
-        public string FileName { get; set; }
-
         [MaxLength(2)]
         public string SourceLanguage { get; set; }
 

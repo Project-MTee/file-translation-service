@@ -5,7 +5,7 @@ using Tilde.MT.FileTranslationService.Interfaces.Services;
 
 namespace Tilde.MT.FileTranslationService.Services
 {
-    public class TaskTranslationService: ITaskTranslationService
+    public class TaskTranslationService : ITaskTranslationService
     {
         private readonly IBus _bus;
 

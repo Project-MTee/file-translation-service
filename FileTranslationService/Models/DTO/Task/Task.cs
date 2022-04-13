@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Tilde.MT.FileTranslationService.Enums;
-using Tilde.MT.FileTranslationService.Models.DTO.File;
 
 namespace Tilde.MT.FileTranslationService.Models.DTO.Task
 {
@@ -41,13 +40,6 @@ namespace Tilde.MT.FileTranslationService.Models.DTO.Task
         [MaxLength(200)]
         [JsonPropertyName("domain")]
         public string Domain { get; init; }
-
-        /// <summary>
-        /// Name of a source file
-        /// </summary>
-        /// <example>Welcome to Word.docx</example>
-        [JsonPropertyName("fileName")]
-        public string FileName { get; init; }
 
         /// <summary>
         /// Date and time of file upload
