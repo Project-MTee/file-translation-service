@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Linq;
 using System.Threading;
 using Tilde.MT.FileTranslationService.Interfaces.Facades;
 using Tilde.MT.FileTranslationService.Models.Configuration;
@@ -20,7 +19,7 @@ namespace Tilde.MT.FileTranslationService.Services
         private readonly ILogger<TranslationCleanupService> _logger;
         private readonly ConfigurationSettings _configurationSettings;
 
-        private readonly TimeSpan workInterval = TimeSpan.FromHours(1);
+        private readonly TimeSpan workInterval = TimeSpan.FromMinutes(1);
 
         private const string ReservedMetadataExpirationGroup = "__default__";
 

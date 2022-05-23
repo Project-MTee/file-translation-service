@@ -21,6 +21,7 @@ namespace Tilde.MT.FileTranslationService.Controllers
     /// </summary>
     [ApiController]
     [Route("file")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class TaskController : BaseController
     {
         private readonly IFileTranslationFacade _fileTranslationFacade;

@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
-using Tilde.MT.FileTranslationService.Models.DTO.File;
-using Tilde.MT.FileTranslationService.Models.DTO.Task;
 
 namespace Tilde.MT.FileTranslationService.Models.Mappings
 {
-    public class MappingProfile:Profile
+    public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             #region Metadata mappings
 
-            CreateMap<Models.DTO.Task.NewTask, Models.Database.Task>()
-                .ForMember(dest => dest.FileName, opt => opt.MapFrom(source => source.File.FileName));
+            CreateMap<Models.DTO.Task.NewTask, Models.Database.Task>();
 
             CreateMap<Models.Database.Task, Models.DTO.Task.Task>();
 
