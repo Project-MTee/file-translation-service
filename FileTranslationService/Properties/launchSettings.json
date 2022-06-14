@@ -25,7 +25,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": "true",
-      "applicationUrl": "http://TLDGUNTARSP:5001;https://localhost:5011;"
+      "applicationUrl": "http://localhost:5001;https://localhost:5011;"
     },
     "Docker": {
       "commandName": "Docker",
