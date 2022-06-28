@@ -72,7 +72,7 @@ namespace Tilde.MT.FileTranslationService
 
             services.AddHostedService<TranslationCleanupService>();
             services.AddSingleton<ILanguageDirectionService, LanguageDirectionService>();
-            services.AddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider> ();
+            services.AddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider>();
 
             services.AddMessaging(Configuration);
 
@@ -99,6 +99,13 @@ namespace Tilde.MT.FileTranslationService
 #if DEBUG
             app.UseCorsPolicies();
 #endif
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("Content-Disposition", "attachment; filename=\"api.json\"");
+                await next.Invoke();
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
